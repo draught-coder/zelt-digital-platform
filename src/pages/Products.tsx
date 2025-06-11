@@ -24,6 +24,8 @@ const Products = () => {
     {
       name: "Advanced Cloud ERP",
       price: "500",
+      originalPrice: "1000",
+      discount: "50% OFF",
       description: "Ideal for growing businesses with moderate transaction volumes",
       popular: true,
       features: [
@@ -42,6 +44,8 @@ const Products = () => {
     {
       name: "Enterprise Cloud ERP",
       price: "1500",
+      originalPrice: "3000",
+      discount: "50% OFF",
       description: "Complete solution for established businesses with complex needs",
       features: [
         "Everything in Advanced plan",
@@ -92,18 +96,18 @@ const Products = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-slate-950">
+    <div className="min-h-screen bg-white">
       {/* Hero Section */}
-      <section className="bg-gradient-to-br from-slate-950 via-blue-950 to-slate-950 py-20">
+      <section className="bg-gradient-to-br from-white via-blue-50 to-white py-20 shadow-lg">
         <div className="container mx-auto px-4">
           <div className="text-center max-w-4xl mx-auto">
-            <h1 className="text-5xl md:text-6xl font-bold text-white mb-6">
+            <h1 className="text-5xl md:text-6xl font-bold text-gray-900 mb-6">
               Cloud ERP
-              <span className="bg-gradient-to-r from-blue-400 to-blue-600 bg-clip-text text-transparent block">
+              <span className="bg-gradient-to-r from-blue-500 to-blue-700 bg-clip-text text-transparent block">
                 Solutions
               </span>
             </h1>
-            <p className="text-xl text-gray-300 mb-8">
+            <p className="text-xl text-gray-600 mb-8">
               Choose the perfect plan to revolutionize your bookkeeping with AI-powered automation
             </p>
           </div>
@@ -111,12 +115,12 @@ const Products = () => {
       </section>
 
       {/* Pricing Cards */}
-      <section className="py-20 bg-slate-900">
+      <section className="py-20 bg-gray-50">
         <div className="container mx-auto px-4">
           <div className="grid lg:grid-cols-3 gap-8 max-w-7xl mx-auto">
             {pricingTiers.map((tier, index) => (
-              <div key={index} className={`relative bg-slate-800 rounded-2xl border ${
-                tier.popular ? 'border-blue-500 scale-105' : 'border-blue-500/20'
+              <div key={index} className={`relative bg-white rounded-2xl border shadow-lg hover:shadow-xl transition-all duration-200 ${
+                tier.popular ? 'border-blue-500 scale-105' : 'border-gray-200'
               } overflow-hidden`}>
                 {tier.popular && (
                   <div className="absolute top-0 left-0 right-0 bg-gradient-to-r from-blue-500 to-blue-700 text-white text-center py-2 text-sm font-medium">
@@ -125,18 +129,18 @@ const Products = () => {
                   </div>
                 )}
                 {tier.discount && (
-                  <div className="absolute top-4 right-4 bg-red-500 text-white px-3 py-1 rounded-full text-sm font-medium">
+                  <div className="absolute top-4 right-4 bg-red-500 text-white px-3 py-1 rounded-full text-sm font-medium shadow-lg">
                     {tier.discount}
                   </div>
                 )}
                 
                 <div className={`p-8 ${tier.popular ? 'pt-16' : ''}`}>
-                  <h3 className="text-2xl font-bold text-white mb-2">{tier.name}</h3>
-                  <p className="text-gray-400 mb-6">{tier.description}</p>
+                  <h3 className="text-2xl font-bold text-gray-900 mb-2">{tier.name}</h3>
+                  <p className="text-gray-600 mb-6">{tier.description}</p>
                   
                   <div className="mb-6">
-                    <span className="text-5xl font-bold text-blue-400">RM{tier.price}</span>
-                    <span className="text-gray-400">/month</span>
+                    <span className="text-5xl font-bold text-blue-600">RM{tier.price}</span>
+                    <span className="text-gray-600">/month</span>
                     {tier.originalPrice && (
                       <div className="text-gray-500 line-through text-xl">RM{tier.originalPrice}/month</div>
                     )}
@@ -145,8 +149,8 @@ const Products = () => {
                   <ul className="space-y-4 mb-8">
                     {tier.features.map((feature, featureIndex) => (
                       <li key={featureIndex} className="flex items-start space-x-3">
-                        <Check className="w-5 h-5 text-blue-400 mt-0.5 flex-shrink-0" />
-                        <span className="text-gray-300">{feature}</span>
+                        <Check className="w-5 h-5 text-blue-500 mt-0.5 flex-shrink-0" />
+                        <span className="text-gray-700">{feature}</span>
                       </li>
                     ))}
                     {tier.limitations.map((limitation, limitIndex) => (
@@ -159,10 +163,10 @@ const Products = () => {
 
                   <Link
                     to="/contact"
-                    className={`w-full py-4 rounded-full font-medium transition-all duration-200 block text-center ${
+                    className={`w-full py-4 rounded-full font-medium transition-all duration-200 block text-center shadow-lg ${
                       tier.popular
                         ? 'bg-gradient-to-r from-blue-500 to-blue-700 text-white hover:from-blue-600 hover:to-blue-800'
-                        : 'border border-blue-500 text-blue-400 hover:bg-blue-500 hover:text-white'
+                        : 'border border-blue-500 text-blue-600 hover:bg-blue-500 hover:text-white'
                     }`}
                   >
                     Get Started Today
@@ -175,24 +179,24 @@ const Products = () => {
       </section>
 
       {/* WhatsApp Feature Highlight */}
-      <section className="py-20 bg-gradient-to-br from-green-900/20 to-slate-950">
+      <section className="py-20 bg-white">
         <div className="container mx-auto px-4">
           <div className="max-w-6xl mx-auto">
             <div className="text-center mb-16">
-              <h2 className="text-4xl font-bold text-white mb-4">WhatsApp Invoice Capture</h2>
-              <p className="text-xl text-gray-400">Revolutionary feature that changes everything</p>
+              <h2 className="text-4xl font-bold text-gray-900 mb-4">WhatsApp Invoice Capture</h2>
+              <p className="text-xl text-gray-600">Revolutionary feature that changes everything</p>
             </div>
             
             <div className="grid lg:grid-cols-2 gap-12 items-center">
               <div>
-                <h3 className="text-2xl font-bold text-white mb-6">How It Works</h3>
+                <h3 className="text-2xl font-bold text-gray-900 mb-6">How It Works</h3>
                 <ul className="space-y-4">
                   {whatsappFeatures.map((feature, index) => (
                     <li key={index} className="flex items-start space-x-3">
                       <div className="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center text-white font-bold text-sm flex-shrink-0">
                         {index + 1}
                       </div>
-                      <span className="text-gray-300">{feature}</span>
+                      <span className="text-gray-700">{feature}</span>
                     </li>
                   ))}
                 </ul>
@@ -201,7 +205,7 @@ const Products = () => {
                     href="https://wa.me/60123456789"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="bg-green-500 hover:bg-green-600 text-white px-6 py-3 rounded-full font-medium transition-colors duration-200 inline-flex items-center space-x-2"
+                    className="bg-green-500 hover:bg-green-600 text-white px-6 py-3 rounded-full font-medium transition-colors duration-200 inline-flex items-center space-x-2 shadow-lg"
                   >
                     <span>Try WhatsApp Demo</span>
                     <ArrowRight className="w-5 h-5" />
@@ -209,15 +213,15 @@ const Products = () => {
                 </div>
               </div>
               
-              <div className="bg-slate-800 p-8 rounded-2xl border border-green-500/20">
-                <h4 className="text-lg font-semibold text-white mb-4">Send us your invoice like this:</h4>
-                <div className="bg-green-500 text-white p-4 rounded-lg mb-4">
+              <div className="bg-gray-50 p-8 rounded-2xl border border-gray-200 shadow-lg">
+                <h4 className="text-lg font-semibold text-gray-900 mb-4">Send us your invoice like this:</h4>
+                <div className="bg-green-500 text-white p-4 rounded-lg mb-4 shadow-md">
                   <p className="text-sm">"Hi Ibn Zelt! Here's my latest invoice 📄"</p>
                   <div className="mt-2 bg-white/20 p-2 rounded text-xs">
                     📎 invoice_12345.pdf
                   </div>
                 </div>
-                <div className="text-gray-400 text-sm">
+                <div className="text-gray-600 text-sm">
                   ✅ Processed automatically<br/>
                   ✅ Data extracted and categorized<br/>
                   ✅ Added to your books instantly
@@ -229,22 +233,22 @@ const Products = () => {
       </section>
 
       {/* Additional Services */}
-      <section className="py-20 bg-slate-900">
+      <section className="py-20 bg-gray-50">
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-white mb-4">Additional Services</h2>
-            <p className="text-xl text-gray-400">Expert consultation services requiring appointment booking</p>
+            <h2 className="text-4xl font-bold text-gray-900 mb-4">Additional Services</h2>
+            <p className="text-xl text-gray-600">Expert consultation services requiring appointment booking</p>
           </div>
           
           <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
             {additionalServices.map((service, index) => (
-              <div key={index} className="bg-slate-800 p-6 rounded-2xl border border-blue-500/20">
-                <h3 className="text-xl font-semibold text-white mb-3">{service.title}</h3>
-                <p className="text-gray-400 mb-4">{service.description}</p>
+              <div key={index} className="bg-white p-6 rounded-2xl border border-gray-200 shadow-lg hover:shadow-xl transition-all duration-200">
+                <h3 className="text-xl font-semibold text-gray-900 mb-3">{service.title}</h3>
+                <p className="text-gray-600 mb-4">{service.description}</p>
                 {service.appointment && (
                   <Link
                     to="/contact"
-                    className="inline-flex items-center space-x-2 text-blue-400 hover:text-blue-300 font-medium"
+                    className="inline-flex items-center space-x-2 text-blue-600 hover:text-blue-700 font-medium"
                   >
                     <span>Book Consultation</span>
                     <ArrowRight className="w-4 h-4" />
@@ -257,14 +261,14 @@ const Products = () => {
       </section>
 
       {/* CTA Section */}
-      <section className="py-20 bg-gradient-to-br from-slate-950 via-blue-950 to-slate-950">
+      <section className="py-20 bg-white shadow-lg">
         <div className="container mx-auto px-4 text-center">
-          <h2 className="text-4xl font-bold text-white mb-4">Ready to Transform Your Bookkeeping?</h2>
-          <p className="text-xl text-gray-400 mb-8">Join the digital revolution and experience the future of financial management</p>
+          <h2 className="text-4xl font-bold text-gray-900 mb-4">Ready to Transform Your Bookkeeping?</h2>
+          <p className="text-xl text-gray-600 mb-8">Join the digital revolution and experience the future of financial management</p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               to="/contact"
-              className="bg-gradient-to-r from-blue-500 to-blue-700 text-white px-8 py-4 rounded-full text-lg font-medium hover:from-blue-600 hover:to-blue-800 transition-all duration-200 transform hover:scale-105"
+              className="bg-gradient-to-r from-blue-500 to-blue-700 text-white px-8 py-4 rounded-full text-lg font-medium hover:from-blue-600 hover:to-blue-800 transition-all duration-200 transform hover:scale-105 shadow-lg"
             >
               Schedule Free Demo
             </Link>
@@ -272,7 +276,7 @@ const Products = () => {
               href="https://wa.me/60123456789"
               target="_blank"
               rel="noopener noreferrer"
-              className="bg-green-500 hover:bg-green-600 text-white px-8 py-4 rounded-full text-lg font-medium transition-all duration-200"
+              className="bg-green-500 hover:bg-green-600 text-white px-8 py-4 rounded-full text-lg font-medium transition-all duration-200 shadow-lg"
             >
               WhatsApp Questions
             </a>

@@ -32,11 +32,13 @@ const Home = () => {
     {
       name: "Advanced Cloud ERP",
       price: "500",
+      originalPrice: "1000",
       features: ["Everything in Basic", "WhatsApp invoice capture", "Real-time dashboard", "Unlimited transactions", "Priority support"]
     },
     {
       name: "Enterprise Cloud ERP", 
       price: "1500",
+      originalPrice: "3000",
       features: ["Everything in Advanced", "Dedicated account manager", "Custom integrations", "Advanced analytics", "24/7 phone support"]
     }
   ];
@@ -44,13 +46,13 @@ const Home = () => {
   return (
     <div className="min-h-screen bg-white">
       {/* Hero Section */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-white via-blue-50 to-white py-20">
+      <section className="relative overflow-hidden bg-gradient-to-br from-white via-blue-50 to-white py-20 shadow-lg">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(59,130,246,0.1),transparent_50%)]"></div>
         <div className="container mx-auto px-4 relative z-10">
           <div className="text-center max-w-4xl mx-auto">
             <h1 className="text-5xl md:text-7xl font-bold text-gray-900 mb-6">
               WE DON'T DO
-              <span className="bg-gradient-to-r from-blue-600 to-blue-800 bg-clip-text text-transparent block">
+              <span className="bg-gradient-to-r from-blue-600 to-blue-800 bg-clip-text text-transparent block font-black tracking-wider" style={{ fontFamily: 'Impact, "Arial Black", sans-serif' }}>
                 NORMAL
               </span>
             </h1>
@@ -87,7 +89,7 @@ const Home = () => {
           </div>
           <div className="grid md:grid-cols-3 gap-8">
             {features.map((feature, index) => (
-              <div key={index} className="bg-white p-8 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105">
+              <div key={index} className="bg-white p-8 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105 border border-gray-200">
                 <div className="mb-4">{feature.icon}</div>
                 <h3 className="text-xl font-semibold text-gray-900 mb-4">{feature.title}</h3>
                 <p className="text-gray-600">{feature.description}</p>
@@ -98,7 +100,7 @@ const Home = () => {
       </section>
 
       {/* Pricing Section */}
-      <section className="py-20 bg-gradient-to-br from-white to-blue-50">
+      <section className="py-20 bg-white">
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold text-gray-900 mb-4">Cloud ERP Pricing</h2>
@@ -106,7 +108,7 @@ const Home = () => {
           </div>
           <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
             {pricingTiers.map((tier, index) => (
-              <div key={index} className={`bg-white p-8 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-200 ${index === 1 ? 'border-2 border-blue-500 scale-105' : ''} relative`}>
+              <div key={index} className={`bg-white p-8 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-200 border border-gray-200 ${index === 1 ? 'border-blue-500 scale-105' : ''} relative`}>
                 {index === 1 && (
                   <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 bg-blue-500 text-white px-4 py-1 rounded-full text-sm font-medium shadow-lg">
                     Most Popular
@@ -145,7 +147,7 @@ const Home = () => {
       </section>
 
       {/* CTA Section */}
-      <section className="py-20 bg-white">
+      <section className="py-20 bg-gray-50 shadow-inner">
         <div className="container mx-auto px-4 text-center">
           <h2 className="text-4xl font-bold text-gray-900 mb-4">Ready to Transform Your Business?</h2>
           <p className="text-xl text-gray-600 mb-8">Join hundreds of Malaysian businesses already using our AI-powered solutions</p>
