@@ -19,17 +19,17 @@ const Header = () => {
   const isActive = (path: string) => location.pathname === path;
 
   return (
-    <header className="fixed top-0 w-full bg-slate-900/95 backdrop-blur-sm z-50 border-b border-blue-500/20">
+    <header className="fixed top-0 w-full bg-white/95 backdrop-blur-sm z-50 shadow-md">
       <div className="container mx-auto px-4 py-4">
         <div className="flex items-center justify-between">
           {/* Logo */}
           <Link to="/" className="flex items-center space-x-3">
-            <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-700 rounded-lg transform rotate-45 flex items-center justify-center">
+            <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-700 rounded-lg transform rotate-45 flex items-center justify-center shadow-lg">
               <div className="w-6 h-6 bg-white rounded-sm transform -rotate-45"></div>
             </div>
             <div>
-              <h1 className="text-xl font-bold text-white">Ibn Zelt</h1>
-              <p className="text-xs text-blue-400 -mt-1">Digital Bookkeeping</p>
+              <h1 className="text-xl font-bold text-gray-900">Ibn Zelt</h1>
+              <p className="text-xs text-blue-600 -mt-1">Digital Bookkeeping</p>
             </div>
           </Link>
 
@@ -41,8 +41,8 @@ const Header = () => {
                 to={item.path}
                 className={`text-sm font-medium transition-colors duration-200 ${
                   isActive(item.path)
-                    ? 'text-blue-400 border-b-2 border-blue-400'
-                    : 'text-gray-300 hover:text-blue-400'
+                    ? 'text-blue-600 border-b-2 border-blue-600'
+                    : 'text-gray-600 hover:text-blue-600'
                 }`}
               >
                 {item.name}
@@ -54,7 +54,7 @@ const Header = () => {
           <div className="hidden md:block">
             <Link
               to="/products"
-              className="bg-gradient-to-r from-blue-500 to-blue-700 text-white px-6 py-2 rounded-full text-sm font-medium hover:from-blue-600 hover:to-blue-800 transition-all duration-200 transform hover:scale-105"
+              className="bg-gradient-to-r from-blue-500 to-blue-700 text-white px-6 py-2 rounded-full text-sm font-medium hover:from-blue-600 hover:to-blue-800 transition-all duration-200 transform hover:scale-105 shadow-lg"
             >
               Start Digital Journey
             </Link>
@@ -62,7 +62,7 @@ const Header = () => {
 
           {/* Mobile Menu Button */}
           <button
-            className="md:hidden text-white"
+            className="md:hidden text-gray-900"
             onClick={() => setIsMenuOpen(!isMenuOpen)}
           >
             {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
@@ -71,7 +71,7 @@ const Header = () => {
 
         {/* Mobile Navigation */}
         {isMenuOpen && (
-          <nav className="md:hidden mt-4 pb-4 border-t border-blue-500/20">
+          <nav className="md:hidden mt-4 pb-4 border-t border-gray-200">
             <div className="flex flex-col space-y-4 pt-4">
               {navItems.map((item) => (
                 <Link
@@ -79,8 +79,8 @@ const Header = () => {
                   to={item.path}
                   className={`text-sm font-medium transition-colors duration-200 ${
                     isActive(item.path)
-                      ? 'text-blue-400'
-                      : 'text-gray-300 hover:text-blue-400'
+                      ? 'text-blue-600'
+                      : 'text-gray-600 hover:text-blue-600'
                   }`}
                   onClick={() => setIsMenuOpen(false)}
                 >
@@ -89,7 +89,7 @@ const Header = () => {
               ))}
               <Link
                 to="/products"
-                className="bg-gradient-to-r from-blue-500 to-blue-700 text-white px-6 py-2 rounded-full text-sm font-medium text-center"
+                className="bg-gradient-to-r from-blue-500 to-blue-700 text-white px-6 py-2 rounded-full text-sm font-medium text-center shadow-lg"
                 onClick={() => setIsMenuOpen(false)}
               >
                 Start Digital Journey
