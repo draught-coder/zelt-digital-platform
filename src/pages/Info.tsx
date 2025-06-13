@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Calculator, Building2, Receipt, Users, Calendar } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -46,9 +45,50 @@ const Info = () => {
 
   return (
     <div className="min-h-screen bg-white">
-      {/* Hero Section */}
-      <section className="bg-gradient-to-br from-white via-blue-50 to-white py-20 shadow-lg">
-        <div className="container mx-auto px-4">
+      {/* Hero Section with Financial Theme Background */}
+      <section className="bg-gradient-to-br from-emerald-50 via-white to-teal-50 py-20 shadow-lg relative overflow-hidden">
+        {/* Financial Pattern Background */}
+        <div className="absolute inset-0">
+          {/* Hexagon Pattern */}
+          <div className="absolute inset-0" style={{
+            backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23059669' fill-opacity='0.3'%3E%3Cpolygon points='30,15 45,25 45,45 30,55 15,45 15,25'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
+            backgroundSize: '60px 60px'
+          }}></div>
+          
+          {/* Floating Financial Icons */}
+          <div className="absolute top-16 left-16 text-emerald-200 opacity-20 animate-float">
+            <Calculator className="w-12 h-12" />
+          </div>
+          <div className="absolute top-32 right-20 text-teal-200 opacity-20 animate-float" style={{ animationDelay: '1s' }}>
+            <Receipt className="w-10 h-10" />
+          </div>
+          <div className="absolute bottom-24 left-1/4 text-emerald-300 opacity-20 animate-float" style={{ animationDelay: '2s' }}>
+            <Building2 className="w-14 h-14" />
+          </div>
+          <div className="absolute top-1/2 right-1/4 text-teal-300 opacity-20 animate-float" style={{ animationDelay: '0.5s' }}>
+            <Users className="w-8 h-8" />
+          </div>
+          
+          {/* Curved Lines */}
+          <div className="absolute top-0 left-0 w-full h-full">
+            <svg className="w-full h-full opacity-10" viewBox="0 0 800 600">
+              <path d="M0,300 Q200,100 400,300 T800,300" stroke="url(#gradient1)" strokeWidth="2" fill="none" />
+              <path d="M0,200 Q300,50 600,200 T800,200" stroke="url(#gradient2)" strokeWidth="1.5" fill="none" />
+              <defs>
+                <linearGradient id="gradient1" x1="0%" y1="0%" x2="100%" y2="0%">
+                  <stop offset="0%" stopColor="#10b981" />
+                  <stop offset="100%" stopColor="#14b8a6" />
+                </linearGradient>
+                <linearGradient id="gradient2" x1="0%" y1="0%" x2="100%" y2="0%">
+                  <stop offset="0%" stopColor="#14b8a6" />
+                  <stop offset="100%" stopColor="#10b981" />
+                </linearGradient>
+              </defs>
+            </svg>
+          </div>
+        </div>
+
+        <div className="container mx-auto px-4 relative z-10">
           <div className="text-center max-w-4xl mx-auto">
             <h1 className="text-5xl md:text-6xl font-bold text-gray-900 mb-6">
               Malaysian Tax
@@ -82,8 +122,16 @@ const Info = () => {
       </section>
 
       {/* Tax Information Tabs */}
-      <section className="py-20 bg-gray-50">
-        <div className="container mx-auto px-4">
+      <section className="py-20 bg-gray-50 relative">
+        {/* Subtle Pattern Overlay */}
+        <div className="absolute inset-0 opacity-5">
+          <div className="absolute inset-0" style={{
+            backgroundImage: `url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23374151' fill-opacity='0.4'%3E%3Ccircle cx='20' cy='20' r='2'/%3E%3C/g%3E%3C/svg%3E")`,
+            backgroundSize: '40px 40px'
+          }}></div>
+        </div>
+        
+        <div className="container mx-auto px-4 relative z-10">
           <Tabs defaultValue="individual" className="max-w-6xl mx-auto">
             <TabsList className="grid w-full grid-cols-3 mb-8">
               <TabsTrigger value="individual" className="flex items-center gap-2">
@@ -202,8 +250,15 @@ const Info = () => {
       </section>
 
       {/* Contact CTA */}
-      <section className="py-20 bg-white shadow-inner">
-        <div className="container mx-auto px-4 text-center">
+      <section className="py-20 bg-white shadow-inner relative overflow-hidden">
+        {/* Minimal Accent Background */}
+        <div className="absolute inset-0">
+          <div className="absolute top-10 right-10 w-32 h-32 bg-emerald-100 rounded-full opacity-30"></div>
+          <div className="absolute bottom-10 left-10 w-24 h-24 bg-teal-100 rounded-full opacity-20"></div>
+          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-48 h-48 border border-emerald-200 rounded-full opacity-10"></div>
+        </div>
+        
+        <div className="container mx-auto px-4 text-center relative z-10">
           <h2 className="text-4xl font-bold text-gray-900 mb-4">Need Professional Tax Guidance?</h2>
           <p className="text-xl text-gray-600 mb-8">Our certified tax experts can help you optimize your tax strategy</p>
           <button className="bg-gradient-to-r from-blue-500 to-blue-700 text-white px-8 py-4 rounded-full text-lg font-medium hover:from-blue-600 hover:to-blue-800 transition-all duration-200 transform hover:scale-105 shadow-lg">
