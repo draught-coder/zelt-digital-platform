@@ -1,10 +1,15 @@
 
-import React from 'react';
-import { Calculator, Building2, Receipt, Users } from 'lucide-react';
+import React, { useState } from 'react';
+import { Calculator, Building2, Receipt, Users, Calendar } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 const Info = () => {
+  const [selectedYear, setSelectedYear] = useState("2024");
+
+  const years = ["2024", "2023", "2022", "2021"];
+
   const individualTaxRates = [
     { income: "First RM5,000", rate: "0%", tax: "0" },
     { income: "Next RM15,000 (RM5,001 - RM20,000)", rate: "1%", tax: "150" },
@@ -54,6 +59,24 @@ const Info = () => {
             <p className="text-xl text-gray-600 mb-8">
               Complete guide to Malaysian tax rates and reliefs for individuals and corporations
             </p>
+            
+            {/* Year Selector */}
+            <div className="flex items-center justify-center gap-4 bg-white p-6 rounded-2xl shadow-lg max-w-md mx-auto">
+              <Calendar className="w-5 h-5 text-blue-600" />
+              <span className="text-gray-700 font-medium">Assessment Year:</span>
+              <Select value={selectedYear} onValueChange={setSelectedYear}>
+                <SelectTrigger className="w-32 bg-white">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent className="bg-white border border-gray-200 shadow-lg z-50">
+                  {years.map((year) => (
+                    <SelectItem key={year} value={year} className="hover:bg-gray-100">
+                      {year}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
           </div>
         </div>
       </section>
@@ -82,8 +105,11 @@ const Info = () => {
                 <div className="flex items-center gap-3 mb-6">
                   <Users className="w-8 h-8 text-blue-600" />
                   <h2 className="text-3xl font-bold text-gray-900">Individual Income Tax Rates</h2>
+                  <span className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-medium">
+                    Assessment Year {selectedYear}
+                  </span>
                 </div>
-                <p className="text-gray-600 mb-8">Progressive tax rates for Malaysian resident individuals (Assessment Year 2024)</p>
+                <p className="text-gray-600 mb-8">Progressive tax rates for Malaysian resident individuals</p>
                 
                 <div className="overflow-x-auto">
                   <Table>
@@ -113,8 +139,11 @@ const Info = () => {
                 <div className="flex items-center gap-3 mb-6">
                   <Building2 className="w-8 h-8 text-blue-600" />
                   <h2 className="text-3xl font-bold text-gray-900">Corporate Income Tax Rates</h2>
+                  <span className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-medium">
+                    Assessment Year {selectedYear}
+                  </span>
                 </div>
-                <p className="text-gray-600 mb-8">Corporate tax rates for Malaysian companies (Assessment Year 2024)</p>
+                <p className="text-gray-600 mb-8">Corporate tax rates for Malaysian companies</p>
                 
                 <div className="grid gap-6">
                   {corporateTaxRates.map((rate, index) => (
@@ -129,7 +158,7 @@ const Info = () => {
                 <div className="mt-8 p-6 bg-blue-50 rounded-xl border border-blue-200">
                   <h3 className="text-lg font-semibold text-blue-900 mb-2">Important Notes:</h3>
                   <ul className="text-blue-800 space-y-1">
-                    <li>• Tax rates are applicable for Assessment Year 2024</li>
+                    <li>• Tax rates are applicable for Assessment Year {selectedYear}</li>
                     <li>• SME rate applies to companies with paid-up capital not exceeding RM2.5 million</li>
                     <li>• All companies must submit their tax returns within 7 months after accounting period end</li>
                   </ul>
@@ -142,8 +171,11 @@ const Info = () => {
                 <div className="flex items-center gap-3 mb-6">
                   <Receipt className="w-8 h-8 text-blue-600" />
                   <h2 className="text-3xl font-bold text-gray-900">Individual Tax Relief</h2>
+                  <span className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-medium">
+                    Assessment Year {selectedYear}
+                  </span>
                 </div>
-                <p className="text-gray-600 mb-8">Available tax reliefs for Malaysian resident individuals (Assessment Year 2024)</p>
+                <p className="text-gray-600 mb-8">Available tax reliefs for Malaysian resident individuals</p>
                 
                 <div className="grid md:grid-cols-2 gap-6">
                   {taxReliefs.map((relief, index) => (
