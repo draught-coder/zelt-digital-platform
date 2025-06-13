@@ -25,8 +25,30 @@ const Home = () => {
   return (
     <div className="min-h-screen bg-white">
       {/* Hero Section */}
-      <section className="pt-20 pb-20">
-        <div className="container mx-auto px-4">
+      <section className="pt-20 pb-20 relative overflow-hidden">
+        {/* Futuristic Background */}
+        <div className="absolute inset-0 bg-gradient-to-br from-blue-50 via-white to-slate-50">
+          {/* Grid Pattern */}
+          <div className="absolute inset-0 opacity-30">
+            <div className="absolute inset-0" style={{
+              backgroundImage: `linear-gradient(rgba(59, 130, 246, 0.1) 1px, transparent 1px),
+                               linear-gradient(90deg, rgba(59, 130, 246, 0.1) 1px, transparent 1px)`,
+              backgroundSize: '40px 40px'
+            }}></div>
+          </div>
+          
+          {/* Geometric shapes */}
+          <div className="absolute top-20 left-10 w-32 h-32 border border-blue-200 rounded-full opacity-20"></div>
+          <div className="absolute top-40 right-20 w-20 h-20 bg-blue-100 rounded-lg rotate-45 opacity-30"></div>
+          <div className="absolute bottom-20 left-1/4 w-16 h-16 border-2 border-blue-300 rotate-12 opacity-25"></div>
+          <div className="absolute top-1/3 right-1/3 w-24 h-24 border border-slate-200 rounded-full opacity-20"></div>
+          
+          {/* Subtle lines */}
+          <div className="absolute top-0 left-1/4 w-px h-full bg-gradient-to-b from-transparent via-blue-200 to-transparent opacity-30"></div>
+          <div className="absolute top-0 right-1/3 w-px h-full bg-gradient-to-b from-transparent via-slate-200 to-transparent opacity-20"></div>
+        </div>
+
+        <div className="container mx-auto px-4 relative z-10">
           <div className="text-center max-w-4xl mx-auto">
             <h1 className="text-6xl md:text-7xl font-bold text-gray-900 mb-8">
               <span style={{ fontFamily: 'Impact, Arial Black, sans-serif' }}>WE DON'T DO NORMAL</span>
@@ -34,9 +56,12 @@ const Home = () => {
             <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
               Cloud ERP for Malaysian SMEs
             </h2>
-            <p className="text-xl text-gray-600 mb-8">
-              Automate your bookkeeping with AI-powered invoice capture via WhatsApp. 
-              From photo to financial records in seconds.
+            <p className="text-xl md:text-2xl text-gray-600 mb-8 font-light tracking-wide leading-relaxed" style={{ 
+              fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
+              letterSpacing: '0.02em'
+            }}>
+              Automate your bookkeeping with AI-powered invoice capture via WhatsApp.<br />
+              <span className="text-blue-600 font-medium">From photo to financial records in seconds.</span>
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link
