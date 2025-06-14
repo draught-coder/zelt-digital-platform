@@ -1,0 +1,2 @@
+git remote add page ssh://git@page.app.ibnzelt.com:29418/app/data/repo.git
+git push page master
