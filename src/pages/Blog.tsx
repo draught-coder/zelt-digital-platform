@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Calendar, Clock, ArrowRight, Search } from 'lucide-react';
 import { supabase } from "@/integrations/supabase/client";
@@ -42,11 +41,16 @@ const Blog = () => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       setSession(session);
       setUser(session?.user ?? null);
+      if (session?.user) {
+        console.log("Current user id (from auth):", session.user.id); // <-- This log will show up!
+      }
     });
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
       setUser(session?.user ?? null);
-
+      if (session?.user) {
+        console.log("Current user id (from auth):", session.user.id); // <-- This log will show up!
+      }
       if (!session) {
         if (location.pathname === "/blog") {
           navigate(`/auth?returnTo=/blog`, { replace: true });
@@ -58,9 +62,10 @@ const Blog = () => {
 
   useEffect(() => {
     if (!user) { setIsAdmin(false); return; }
+    console.log("Current user id (from auth):", user.id); // <-- This log will show up right before admin check.
     supabase
       .from("user_roles")
-      .select("role")
+      .select("role, user_id")
       .eq("user_id", user.id)
       .then(({ data, error }) => {
         console.log("Fetched user_roles:", data, "error:", error);
@@ -288,4 +293,3 @@ const Blog = () => {
 };
 
 export default Blog;
-
