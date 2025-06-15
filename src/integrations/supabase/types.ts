@@ -17,7 +17,7 @@ export type Database = {
           email: string
           id: string
           message: string | null
-          name: string
+          Name: string
         }
         Insert: {
           company?: string | null
@@ -26,7 +26,7 @@ export type Database = {
           email: string
           id?: string
           message?: string | null
-          name: string
+          Name: string
         }
         Update: {
           company?: string | null
@@ -35,7 +35,88 @@ export type Database = {
           email?: string
           id?: string
           message?: string | null
-          name?: string
+          Name?: string
+        }
+        Relationships: []
+      }
+      corporate_tax_rates: {
+        Row: {
+          category: string | null
+          description: string | null
+          id: string
+          rate: string | null
+          year: string
+        }
+        Insert: {
+          category?: string | null
+          description?: string | null
+          id?: string
+          rate?: string | null
+          year?: string
+        }
+        Update: {
+          category?: string | null
+          description?: string | null
+          id?: string
+          rate?: string | null
+          year?: string
+        }
+        Relationships: []
+      }
+      individual_tax_rates: {
+        Row: {
+          bracket_type: string | null
+          calculation: string | null
+          category: string | null
+          id: string
+          rate: string | null
+          statutory_income: string | null
+          tax_rm: string | null
+          year: string
+        }
+        Insert: {
+          bracket_type?: string | null
+          calculation?: string | null
+          category?: string | null
+          id?: string
+          rate?: string | null
+          statutory_income?: string | null
+          tax_rm?: string | null
+          year?: string
+        }
+        Update: {
+          bracket_type?: string | null
+          calculation?: string | null
+          category?: string | null
+          id?: string
+          rate?: string | null
+          statutory_income?: string | null
+          tax_rm?: string | null
+          year?: string
+        }
+        Relationships: []
+      }
+      tax_reliefs: {
+        Row: {
+          amount: string | null
+          category: string | null
+          description: string | null
+          id: string
+          year: string
+        }
+        Insert: {
+          amount?: string | null
+          category?: string | null
+          description?: string | null
+          id?: string
+          year?: string
+        }
+        Update: {
+          amount?: string | null
+          category?: string | null
+          description?: string | null
+          id?: string
+          year?: string
         }
         Relationships: []
       }
