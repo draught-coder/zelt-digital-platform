@@ -62,8 +62,12 @@ const Blog = () => {
       .from("user_roles")
       .select("role")
       .eq("user_id", user.id)
-      .maybeSingle()
-      .then(({ data }) => setIsAdmin(data?.role === "admin"));
+      .then(({ data, error }) => {
+        console.log("Fetched user_roles:", data, "error:", error);
+        // If any of the roles is 'admin', set as admin
+        const isUserAdmin = Array.isArray(data) && data.some((row) => row.role === "admin");
+        setIsAdmin(isUserAdmin);
+      });
   }, [user]);
 
   // Fetch blog posts from Supabase
