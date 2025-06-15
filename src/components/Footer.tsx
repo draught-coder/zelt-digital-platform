@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Link } from 'react-router-dom';
 
@@ -25,22 +24,6 @@ const Footer = () => {
               Revolutionizing bookkeeping in Malaysia with AI-powered digital solutions. 
               Experience the future of financial management today.
             </p>
-            <div className="flex space-x-4">
-              <a
-                href="https://wa.me/60123456789"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-full text-sm font-medium transition-colors duration-200 shadow-lg"
-              >
-                WhatsApp Us
-              </a>
-              <a
-                href="mailto:hello@ibnzelt.com"
-                className="border border-blue-500 hover:bg-blue-500 hover:text-white text-blue-600 px-4 py-2 rounded-full text-sm font-medium transition-colors duration-200 shadow-md"
-              >
-                Email Us
-              </a>
-            </div>
           </div>
 
           {/* Quick Links */}

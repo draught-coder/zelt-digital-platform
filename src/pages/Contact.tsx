@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Mail, Phone, MessageCircle, MapPin, Clock, Bot } from 'lucide-react';
 import ContactForm from "@/components/ContactForm";
@@ -118,7 +119,7 @@ const Contact = () => {
             <div className="text-center mb-12">
               <h2 className="text-4xl font-bold text-gray-900 mb-4">Business Hours</h2>
             </div>
-            <div className="grid md:grid-cols-2 gap-8">
+            <div className="grid md:grid-cols-1 gap-8">
               <div className="bg-white p-8 rounded-2xl shadow-lg border border-gray-200">
                 <div className="flex items-center space-x-3 mb-6">
                   <Clock className="w-6 h-6 text-blue-600" />
@@ -127,33 +128,23 @@ const Contact = () => {
                 <div className="space-y-2 text-gray-600">
                   <div className="flex justify-between">
                     <span>Monday - Friday</span>
-                    <span>9:00 AM - 6:00 PM</span>
+                    <span>10:00 AM - 5:00 PM</span>
                   </div>
                   <div className="flex justify-between">
                     <span>Saturday</span>
-                    <span>9:00 AM - 1:00 PM</span>
+                    <span>Closed</span>
                   </div>
                   <div className="flex justify-between">
                     <span>Sunday</span>
                     <span>Closed</span>
                   </div>
-                </div>
-              </div>
-              <div className="bg-white p-8 rounded-2xl shadow-lg border border-gray-200">
-                <div className="flex items-center space-x-3 mb-6">
-                  <MessageCircle className="w-6 h-6 text-green-600" />
-                  <h3 className="text-xl font-semibold text-gray-900">WhatsApp Support</h3>
-                </div>
-                <div className="space-y-2 text-gray-600">
                   <div className="flex justify-between">
-                    <span>Monday - Sunday</span>
-                    <span>24/7 Available</span>
-                  </div>
-                  <div className="mt-4">
-                    <p className="text-sm">Our AI chatbot is available 24/7 for instant responses. Human support during business hours.</p>
+                    <span>Public Holiday</span>
+                    <span>Closed</span>
                   </div>
                 </div>
               </div>
+              {/* WhatsApp Support box removed */}
             </div>
           </div>
         </div>
@@ -163,3 +154,4 @@ const Contact = () => {
 };
 
 export default Contact;
+
