@@ -1,9 +1,14 @@
 
 import React from "react";
 import { Calendar } from "lucide-react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
-// Remove setSelectedYear and years from props
-const InfoHero: React.FC = () => (
+interface InfoHeroProps {
+  selectedYear: string;
+  setSelectedYear: (year: string) => void;
+  years: string[];
+}
+const InfoHero: React.FC<InfoHeroProps> = ({ selectedYear, setSelectedYear, years }) => (
   <section className="relative py-20 shadow-lg overflow-hidden" style={{ minHeight: 380 }}>
     {/* Professional background image + overlay */}
     <div className="absolute inset-0 z-0">
@@ -26,13 +31,25 @@ const InfoHero: React.FC = () => (
         <p className="text-xl text-gray-700 mb-8 font-medium drop-shadow">
           Complete guide to Malaysian tax rates and reliefs for individuals and corporations
         </p>
-        {/* Remove Year Selector */}
+        {/* Year Selector */}
         <div className="flex items-center justify-center gap-4 bg-white/90 p-6 rounded-2xl shadow-lg max-w-md mx-auto border border-slate-200 backdrop-blur">
-          <span className="text-gray-800 font-medium">All Assessment Years</span>
+          <Calendar className="w-5 h-5 text-blue-700" />
+          <span className="text-gray-800 font-medium">Assessment Year:</span>
+          <Select value={selectedYear} onValueChange={setSelectedYear}>
+            <SelectTrigger className="w-32 bg-white">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent className="bg-white border border-gray-200 shadow-lg z-50">
+              {years.map((year) => (
+                <SelectItem key={year} value={year} className="hover:bg-gray-100">
+                  {year}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
       </div>
     </div>
   </section>
 );
-
 export default InfoHero;

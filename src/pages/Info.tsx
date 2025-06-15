@@ -1,6 +1,6 @@
 
 // Refactored Info Page – loads new extracted components
-import React from 'react';
+import React, { useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import InfoHero from "@/components/info/InfoHero";
 import IndividualTaxRates from "@/components/info/IndividualTaxRates";
@@ -9,16 +9,20 @@ import TaxReliefCards from "@/components/info/TaxReliefCards";
 import InfoContactCTA from "@/components/info/InfoContactCTA";
 
 const Info = () => {
-  // Remove selectedYear state and years array; show all years in all components now
+  const [selectedYear, setSelectedYear] = useState("2024");
+  const years = ["2024", "2023", "2022", "2021"];
+
   return (
     <div className="min-h-screen bg-white">
-      <InfoHero />
+      <InfoHero selectedYear={selectedYear} setSelectedYear={setSelectedYear} years={years} />
+
       {/* Tax Information Tabs */}
       <section className="py-20 bg-gray-50 relative">
         <div className="container mx-auto px-4 relative z-10">
           <Tabs defaultValue="individual" className="max-w-6xl mx-auto">
             <TabsList className="grid w-full grid-cols-3 mb-8">
               <TabsTrigger value="individual" className="flex items-center gap-2">
+                {/* Avoid redundant icon import, handled by component */}
                 Individual Tax
               </TabsTrigger>
               <TabsTrigger value="corporate" className="flex items-center gap-2">
@@ -29,13 +33,13 @@ const Info = () => {
               </TabsTrigger>
             </TabsList>
             <TabsContent value="individual" className="space-y-6">
-              <IndividualTaxRates />
+              <IndividualTaxRates selectedYear={selectedYear} />
             </TabsContent>
             <TabsContent value="corporate" className="space-y-6">
-              <CorporateTaxRates />
+              <CorporateTaxRates selectedYear={selectedYear} />
             </TabsContent>
             <TabsContent value="relief" className="space-y-6">
-              <TaxReliefCards />
+              <TaxReliefCards selectedYear={selectedYear} />
             </TabsContent>
           </Tabs>
         </div>
