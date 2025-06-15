@@ -52,18 +52,24 @@ const ContactForm: React.FC = () => {
   return (
     <Form {...form}>
       <form
-        className="bg-gray-50 p-8 rounded-lg shadow-lg border border-gray-200"
+        className="bg-white p-5 md:p-6 rounded-xl shadow border border-gray-100 max-w-full space-y-4 transition-all"
         onSubmit={form.handleSubmit(onSubmit)}
       >
-        <div className="grid md:grid-cols-2 gap-6 mb-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
           <FormField
             control={form.control}
             name="first_name"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>First Name</FormLabel>
+                <FormLabel className="text-sm font-semibold text-gray-800">
+                  First Name
+                </FormLabel>
                 <FormControl>
-                  <Input placeholder="Enter your first name" {...field} />
+                  <Input
+                    placeholder="First name"
+                    className="h-9 px-3 py-1.5 rounded-md bg-gray-50 text-gray-900 border-none focus:ring-2 focus:ring-blue-400 focus:bg-white"
+                    {...field}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -74,26 +80,35 @@ const ContactForm: React.FC = () => {
             name="last_name"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Last Name</FormLabel>
+                <FormLabel className="text-sm font-semibold text-gray-800">
+                  Last Name
+                </FormLabel>
                 <FormControl>
-                  <Input placeholder="Enter your last name" {...field} />
+                  <Input
+                    placeholder="Last name"
+                    className="h-9 px-3 py-1.5 rounded-md bg-gray-50 text-gray-900 border-none focus:ring-2 focus:ring-blue-400 focus:bg-white"
+                    {...field}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
             )}
           />
         </div>
-        <div className="mb-6">
+        <div className="grid gap-3 md:grid-cols-2">
           <FormField
             control={form.control}
             name="email"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Email</FormLabel>
+                <FormLabel className="text-sm font-semibold text-gray-800">
+                  Email
+                </FormLabel>
                 <FormControl>
                   <Input
                     type="email"
-                    placeholder="Enter your email address"
+                    placeholder="you@email.com"
+                    className="h-9 px-3 py-1.5 rounded-md bg-gray-50 text-gray-900 border-none focus:ring-2 focus:ring-blue-400 focus:bg-white"
                     {...field}
                   />
                 </FormControl>
@@ -101,17 +116,18 @@ const ContactForm: React.FC = () => {
               </FormItem>
             )}
           />
-        </div>
-        <div className="mb-6">
           <FormField
             control={form.control}
             name="company"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Company</FormLabel>
+                <FormLabel className="text-sm font-semibold text-gray-800">
+                  Company <span className="text-gray-400 font-normal">(Optional)</span>
+                </FormLabel>
                 <FormControl>
                   <Input
-                    placeholder="Enter your company name"
+                    placeholder="Company name"
+                    className="h-9 px-3 py-1.5 rounded-md bg-gray-50 text-gray-900 border-none focus:ring-2 focus:ring-blue-400 focus:bg-white"
                     {...field}
                   />
                 </FormControl>
@@ -120,16 +136,19 @@ const ContactForm: React.FC = () => {
             )}
           />
         </div>
-        <div className="mb-6">
+        <div className="grid gap-3 md:grid-cols-2">
           <FormField
             control={form.control}
             name="contact_number"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Contact Number <span className="text-gray-400">(Optional)</span></FormLabel>
+                <FormLabel className="text-sm font-semibold text-gray-800">
+                  Contact Number <span className="text-gray-400 font-normal">(Optional)</span>
+                </FormLabel>
                 <FormControl>
                   <Input
-                    placeholder="Enter your contact number"
+                    placeholder="Phone or WhatsApp"
+                    className="h-9 px-3 py-1.5 rounded-md bg-gray-50 text-gray-900 border-none focus:ring-2 focus:ring-blue-400 focus:bg-white"
                     {...field}
                   />
                 </FormControl>
@@ -138,32 +157,35 @@ const ContactForm: React.FC = () => {
             )}
           />
         </div>
-        <div className="mb-6">
-          <FormField
-            control={form.control}
-            name="message"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Message</FormLabel>
-                <FormControl>
-                  <Textarea
-                    placeholder="Tell us about your bookkeeping needs..."
-                    rows={5}
-                    {...field}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+        <FormField
+          control={form.control}
+          name="message"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel className="text-sm font-semibold text-gray-800">
+                Message
+              </FormLabel>
+              <FormControl>
+                <Textarea
+                  placeholder="Tell us about your bookkeeping needs…"
+                  rows={4}
+                  className="min-h-[42px] rounded-md px-3 py-2 bg-gray-50 text-gray-900 border-none focus:ring-2 focus:ring-blue-400 focus:bg-white"
+                  {...field}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <div className="flex justify-end">
+          <button
+            type="submit"
+            className="bg-blue-600 hover:bg-blue-700 text-white py-2 px-6 rounded-md font-semibold shadow-sm text-sm transition-all min-w-[120px] focus:outline-none focus:ring-2 focus:ring-blue-400"
+            disabled={form.formState.isSubmitting}
+          >
+            {form.formState.isSubmitting ? "Sending..." : "Send"}
+          </button>
         </div>
-        <button
-          type="submit"
-          className="w-full bg-gradient-to-r from-blue-500 to-blue-700 text-white py-4 rounded-lg font-medium hover:from-blue-600 hover:to-blue-800 transition-all duration-200 shadow-lg"
-          disabled={form.formState.isSubmitting}
-        >
-          {form.formState.isSubmitting ? "Sending..." : "Send Message"}
-        </button>
       </form>
     </Form>
   );
