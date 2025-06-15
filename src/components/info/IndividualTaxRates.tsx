@@ -1,4 +1,3 @@
-
 import React from "react";
 import { Users } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
@@ -15,6 +14,7 @@ const fetchIndividualTaxRates = async (year: string) => {
     .from("individual_tax_rates")
     .select("category,chargeable_income,bracket_type,calculation,rate,tax_rm")
     .eq("year", year)
+    .order("category", { ascending: true })
     .order("chargeable_income", { ascending: true });
   if (error) throw new Error(error.message);
   return data;
