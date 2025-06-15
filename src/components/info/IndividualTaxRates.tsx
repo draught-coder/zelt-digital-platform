@@ -11,7 +11,6 @@ interface IndividualTaxRatesProps {
 
 // Fetch from supabase
 const fetchTaxRates = async (year: string) => {
-  // Fetch only for selected year, sorted as original
   const { data, error } = await supabase
     .from("individual_tax_rates")
     .select("*")
@@ -56,10 +55,10 @@ const IndividualTaxRates: React.FC<IndividualTaxRatesProps> = ({ selectedYear })
               <TableRow>
                 <TableHead>Category</TableHead>
                 <TableHead>Chargeable Income</TableHead>
-                <TableHead>Bracket Type</TableHead>
+                <TableHead>Bracket</TableHead>
                 <TableHead>Calculation</TableHead>
                 <TableHead>Tax Rate</TableHead>
-                <TableHead>Tax (RM)</TableHead>
+                <TableHead>Tax Payable</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -82,3 +81,4 @@ const IndividualTaxRates: React.FC<IndividualTaxRatesProps> = ({ selectedYear })
 };
 
 export default IndividualTaxRates;
+
