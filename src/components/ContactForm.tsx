@@ -27,8 +27,7 @@ const ContactForm: React.FC = () => {
 
   const onSubmit = async (data: ContactFormValues) => {
     const { error } = await supabase.from("contact_messages").insert({
-      first_name: data.name, // store in first_name
-      last_name: "",         // since we removed it, leave blank
+      Name: data.name, // Only this, as per schema
       email: data.email,
       company: data.company || null,
       contact_number: data.contact_number || null,
@@ -165,4 +164,3 @@ const ContactForm: React.FC = () => {
 };
 
 export default ContactForm;
-
