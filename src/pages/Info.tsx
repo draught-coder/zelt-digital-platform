@@ -11,6 +11,7 @@ import { supabase } from "@/integrations/supabase/client";
 const Info = () => {
   const [years, setYears] = useState<string[]>([]);
   const [selectedYear, setSelectedYear] = useState<string>("");
+  const [fetchError, setFetchError] = useState<string | null>(null);
 
   // Fetch available years dynamically from Supabase
   useEffect(() => {
@@ -20,13 +21,30 @@ const Info = () => {
         .select('year')
         .order('year', { ascending: false });
 
-      if (!error && data) {
+      console.log("Fetched years data from Supabase:", data);
+      if (error) {
+        setFetchError("Failed to fetch years from Supabase.");
+        setYears([]);
+        setSelectedYear("");
+        return;
+      }
+      if (data) {
         // Get unique years as strings
         const uniqueYears = Array.from(
           new Set(data.map((row) => typeof row.year === 'string' ? row.year : String(row.year)))
         );
+        console.log("Mapped unique years:", uniqueYears);
         setYears(uniqueYears);
         setSelectedYear(uniqueYears[0] ?? "");
+        if (uniqueYears.length === 0) {
+          setFetchError("No assessment years found in the database.");
+        } else {
+          setFetchError(null);
+        }
+      } else {
+        setFetchError("No data returned from database.");
+        setYears([]);
+        setSelectedYear("");
       }
     };
     fetchYears();
@@ -36,9 +54,13 @@ const Info = () => {
     <div className="min-h-screen bg-white">
       <InfoHero selectedYear={selectedYear} setSelectedYear={setSelectedYear} years={years} />
 
-      {/* Tax Information Tabs */}
       <section className="py-20 bg-gray-50 relative">
         <div className="container mx-auto px-4 relative z-10">
+          {fetchError && (
+            <div className="mb-8 max-w-xl mx-auto rounded-lg bg-red-100 text-red-800 p-4 border border-red-200 text-center font-semibold">
+              {fetchError}
+            </div>
+          )}
           <Tabs defaultValue="individual" className="max-w-6xl mx-auto">
             <TabsList className="grid w-full grid-cols-3 mb-8">
               <TabsTrigger value="individual" className="flex items-center gap-2">
