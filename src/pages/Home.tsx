@@ -43,15 +43,14 @@ const Home = () => {
             zIndex: 1,
           }}
         />
-        {/* --- IMPROVED Neon Futuristic Grid (SVG) Overlay --- */}
+        {/* Neon Futuristic Grid (SVG) */}
         <div
           data-parallax-depth="2"
           className="absolute inset-0"
           style={{
-            zIndex: 20, // set high to make visible
-            opacity: 0.55, // higher opacity
-            pointerEvents: 'none',
-            mixBlendMode: 'lighten', // FIXED: changed from 'lighter' to 'lighten' for TypeScript
+            zIndex: 2,
+            opacity: 0.23,
+            pointerEvents: 'none'
           }}
         >
           <svg
@@ -60,19 +59,12 @@ const Home = () => {
             viewBox="0 0 1920 1080"
             preserveAspectRatio="none"
             style={{
-              width: '100vw',
-              height: '100vh',
-              minWidth: '100%',
-              minHeight: '100%',
-              position: 'absolute',
-              left: 0,
-              top: 0,
+              width: '100%',
+              height: '100%',
               display: 'block',
-              filter: 'drop-shadow(0 0 60px #7afcff) drop-shadow(0 0 120px #8b5cf6)', // heavy glows!
-              pointerEvents: 'none'
             }}
           >
-            {/* Vertical neon lines */}
+            {/* Vertical lines */}
             {[...Array(22)].map((_, i) => (
               <line
                 key={`v${i}`}
@@ -81,14 +73,12 @@ const Home = () => {
                 x2={(i * 96).toString()}
                 y2="1080"
                 stroke="#54d3fc"
-                strokeWidth="2.5"
-                opacity={i % 4 === 0 ? 0.7 : 0.33}
-                style={{
-                  filter: 'drop-shadow(0 0 24px #54d3fc)'
-                }}
+                strokeWidth="1.5"
+                opacity={i % 4 === 0 ? 0.28 : 0.13}
+                style={{ filter: 'drop-shadow(0 0 8px #7edbfe)' }}
               />
             ))}
-            {/* Horizontal neon lines */}
+            {/* Horizontal lines */}
             {[...Array(13)].map((_, i) => (
               <line
                 key={`h${i}`}
@@ -97,41 +87,20 @@ const Home = () => {
                 x2="1920"
                 y2={(i * 88).toString()}
                 stroke="#bb9aff"
-                strokeWidth="2.5"
-                opacity={i % 3 === 0 ? 0.5 : 0.22}
-                style={{
-                  filter: 'drop-shadow(0 0 18px #bb9aff)'
-                }}
+                strokeWidth="1.5"
+                opacity={i % 3 === 0 ? 0.23 : 0.10}
+                style={{ filter: 'drop-shadow(0 0 8px #c7b3ff)' }}
               />
             ))}
-            {/* Central Neon Glow */}
-            <ellipse
-              cx="960"
-              cy="540"
-              rx="720"
-              ry="220"
-              fill="none"
-              stroke="#82f3ff"
-              strokeWidth="7"
-              opacity="0.19"
-              style={{
-                filter: 'drop-shadow(0 0 96px #82f3ff)'
-              }}
-            />
             {/* Edge glow */}
             <rect
-              x="0"
-              y="0"
-              width="1920"
-              height="1080"
+              x="0" y="0" width="1920" height="1080"
               fill="none"
               stroke="#8b5cf6"
-              strokeWidth="32"
-              opacity="0.29"
+              strokeWidth="22"
+              opacity="0.15"
               rx="40"
-              style={{
-                filter: 'drop-shadow(0 0 82px #c7b3ff)'
-              }}
+              style={{ filter: 'drop-shadow(0 0 38px #a993fe)' }}
             />
           </svg>
         </div>
@@ -149,7 +118,7 @@ const Home = () => {
             opacity: 0.13,
           }}
         />
-        {/* Light beams */}
+        {/* Light beams (keep, slightly more subtle) */}
         <div
           data-parallax-depth="2"
           className="absolute top-0 left-1/4 w-px h-full bg-gradient-to-b from-transparent via-blue-400 to-transparent opacity-15 animate-pulse"
@@ -165,7 +134,7 @@ const Home = () => {
           className="absolute top-0 left-3/4 w-px h-full bg-gradient-to-b from-transparent via-cyan-400 to-transparent opacity-10 animate-pulse"
           style={{ animationDelay: '2s', zIndex: 6 }}
         />
-        {/* Subtle noise overlay */}
+        {/* Subtle noise overlay (keep) */}
         <div
           className="absolute inset-0"
           style={{
