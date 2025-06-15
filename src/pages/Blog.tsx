@@ -1,12 +1,16 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import { Calendar, Clock, ArrowRight, Search, Plus, Edit, Trash2, X } from 'lucide-react';
+
+import React, { useState, useEffect } from 'react';
+import { Calendar, Clock, ArrowRight, Search } from 'lucide-react';
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import { toast } from "@/components/ui/use-toast";
 import { useNavigate, useLocation } from 'react-router-dom';
+import BlogAdminPanel from "./blog/BlogAdminPanel";
+import BlogPostList from "./blog/BlogPostList";
+import BlogPostEditor from "./blog/BlogPostEditor";
+import NewsletterSignup from "./blog/NewsletterSignup";
 
 const Blog = () => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -26,13 +30,11 @@ const Blog = () => {
   });
 
   const queryClient = useQueryClient();
-
   const navigate = useNavigate();
   const location = useLocation();
 
   // Fetch session and subscribe to auth updates
   useEffect(() => {
-    // Auth state listener first
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       setSession(session);
       setUser(session?.user ?? null);
@@ -41,9 +43,7 @@ const Blog = () => {
       setSession(session);
       setUser(session?.user ?? null);
 
-      // If user is not logged in, redirect to /auth with returnTo=/blog
       if (!session) {
-        // Don't redirect from /auth itself
         if (location.pathname === "/blog") {
           navigate(`/auth?returnTo=/blog`, { replace: true });
         }
@@ -53,11 +53,9 @@ const Blog = () => {
   }, [navigate, location.pathname]);
 
   // If not authenticated, show nothing so redirect works.
-  if (!user) {
-    return null;
-  }
+  if (!user) return null;
 
-  // Helper: Check if user is admin
+  // Admin state
   const [isAdmin, setIsAdmin] = useState(false);
   useEffect(() => {
     if (!user) { setIsAdmin(false); return; }
@@ -165,7 +163,6 @@ const Blog = () => {
 
   // Save new or updated post
   const submitPost = () => {
-    // Minimal validation
     if (!form.title) {
       toast({ title: "Title is required", variant: "destructive" });
       return;
@@ -192,7 +189,6 @@ const Blog = () => {
             <p className="text-xl text-gray-600 mb-8">
               Stay updated with tax regulations, bookkeeping tips, and digital transformation insights
             </p>
-            
             {/* Search Bar */}
             <div className="max-w-md mx-auto relative">
               <div className="relative">
@@ -212,105 +208,28 @@ const Blog = () => {
 
       {/* Admin Panel */}
       {isAdmin && (
-        <section className="py-10 bg-gray-50 border-b">
-          <div className="container mx-auto px-4 max-w-4xl">
-            <div className="flex justify-between items-center mb-4">
-              <h3 className="text-2xl font-semibold text-gray-900">Blog Admin Panel</h3>
-              <Button onClick={() => openEditor()} variant="default" size="sm">
-                <Plus className="mr-2" /> New Post
-              </Button>
-            </div>
-
-            {showEditor && (
-              <div className="bg-white p-6 rounded-lg shadow-lg mb-6 border relative">
-                <button
-                  aria-label="Close editor"
-                  onClick={() => { setShowEditor(false); setEditPost(null); }}
-                  className="absolute top-2 right-2 text-gray-400 hover:text-gray-700"
-                >
-                  <X />
-                </button>
-                <div className="grid gap-4">
-                  <Input
-                    name="title"
-                    value={form.title}
-                    onChange={handleChange}
-                    placeholder="Title"
-                    className="font-bold text-lg"
-                  />
-                  <Input
-                    name="category"
-                    value={form.category}
-                    onChange={handleChange}
-                    placeholder="Category"
-                  />
-                  <Input
-                    name="date"
-                    value={form.date}
-                    onChange={handleChange}
-                    placeholder="Date (YYYY-MM-DD)"
-                  />
-                  <Input
-                    name="read_time"
-                    value={form.read_time}
-                    onChange={handleChange}
-                    placeholder="Read Time (e.g., 5 min read)"
-                  />
-                  <Textarea
-                    name="excerpt"
-                    value={form.excerpt}
-                    onChange={handleChange}
-                    placeholder="Excerpt"
-                  />
-                  <Textarea
-                    name="content"
-                    value={form.content}
-                    onChange={handleChange}
-                    placeholder="Content"
-                  />
-                  <div className="flex gap-2 mt-2">
-                    <Button onClick={submitPost} disabled={createMutation.isPending || updateMutation.isPending}>
-                      {editPost ? "Update Post" : "Create Post"}
-                    </Button>
-                    <Button type="button" variant="secondary" onClick={() => { setShowEditor(false); setEditPost(null); }}>
-                      Cancel
-                    </Button>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {/* Admin Blog List */}
-            <div className="grid gap-4">
-              {blogPosts && blogPosts.length > 0 ? blogPosts.map((post: any) => (
-                <div key={post.id} className="bg-white p-6 rounded-lg shadow border flex flex-col md:flex-row md:justify-between md:items-center">
-                  <div>
-                    <h4 className="text-lg font-bold text-gray-900">{post.title}</h4>
-                    <div className="text-sm text-gray-500">{post.category} | {post.date}</div>
-                  </div>
-                  <div className="flex space-x-2 mt-3 md:mt-0">
-                    <Button size="sm" variant="outline" onClick={() => openEditor(post)}>
-                      <Edit /> Edit
-                    </Button>
-                    <Button
-                      size="sm"
-                      variant="destructive"
-                      onClick={() => {
-                        if (window.confirm(`Delete "${post.title}"?`)) {
-                          deleteMutation.mutate(post.id);
-                        }
-                      }}
-                    >
-                      <Trash2 /> Delete
-                    </Button>
-                  </div>
-                </div>
-              )) : (
-                <div className="p-6 text-center text-gray-500">No blog posts yet.</div>
-              )}
-            </div>
-          </div>
-        </section>
+        <BlogAdminPanel onNewPost={() => openEditor()}>
+          {showEditor && (
+            <BlogPostEditor
+              form={form}
+              onChange={handleChange}
+              onSave={submitPost}
+              onCancel={() => { setShowEditor(false); setEditPost(null); }}
+              isEditing={!!editPost}
+              loading={createMutation.isPending || updateMutation.isPending}
+            />
+          )}
+          <BlogPostList
+            posts={blogPosts || []}
+            onEdit={openEditor}
+            onDelete={(id) => {
+              const post = blogPosts?.find((p: any) => p.id === id);
+              if (post && window.confirm(`Delete "${post.title}"?`)) {
+                deleteMutation.mutate(id);
+              }
+            }}
+          />
+        </BlogAdminPanel>
       )}
 
       {/* Blog Posts for everyone */}
@@ -357,24 +276,7 @@ const Blog = () => {
       </section>
 
       {/* Newsletter Signup */}
-      <section className="py-20 bg-white shadow-lg">
-        <div className="container mx-auto px-4 text-center">
-          <h2 className="text-4xl font-bold text-gray-900 mb-4">Stay Updated</h2>
-          <p className="text-xl text-gray-600 mb-8">Get the latest tax updates and bookkeeping tips delivered to your inbox</p>
-          <div className="max-w-md mx-auto">
-            <div className="flex gap-2">
-              <Input
-                type="email"
-                placeholder="Enter your email"
-                className="flex-1"
-              />
-              <Button>
-                Subscribe
-              </Button>
-            </div>
-          </div>
-        </div>
-      </section>
+      <NewsletterSignup />
     </div>
   );
 };
