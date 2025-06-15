@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { toast } from "@/components/ui/sonner";
@@ -12,14 +12,22 @@ const AuthPage = () => {
   const [password, setPassword] = useState("");
   const [errorMsg, setErrorMsg] = useState("");
   const navigate = useNavigate();
+  const location = useLocation();
+
+  // Find intended redirect URL (query param ?returnTo=...)
+  function getReturnPath() {
+    const params = new URLSearchParams(location.search);
+    const returnTo = params.get("returnTo");
+    return returnTo || "/";
+  }
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (session) {
-        navigate("/", { replace: true });
+        navigate(getReturnPath(), { replace: true });
       }
     });
-  }, [navigate]);
+  }, [navigate, location.search]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -32,7 +40,7 @@ const AuthPage = () => {
       setErrorMsg("Invalid credentials or user not confirmed.");
     } else {
       toast("Success", { description: "Logged in. Redirecting..." });
-      navigate("/", { replace: true });
+      navigate(getReturnPath(), { replace: true });
     }
 
     setLoading(false);

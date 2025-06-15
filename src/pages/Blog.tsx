@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useCallback } from 'react';
 import { Calendar, Clock, ArrowRight, Search, Plus, Edit, Trash2, X } from 'lucide-react';
 import { supabase } from "@/integrations/supabase/client";
@@ -7,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "@/components/ui/use-toast";
+import { useNavigate, useLocation } from 'react-router-dom';
 
 const Blog = () => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -27,8 +27,12 @@ const Blog = () => {
 
   const queryClient = useQueryClient();
 
+  const navigate = useNavigate();
+  const location = useLocation();
+
   // Fetch session and subscribe to auth updates
   useEffect(() => {
+    // Auth state listener first
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       setSession(session);
       setUser(session?.user ?? null);
@@ -36,9 +40,22 @@ const Blog = () => {
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
       setUser(session?.user ?? null);
+
+      // If user is not logged in, redirect to /auth with returnTo=/blog
+      if (!session) {
+        // Don't redirect from /auth itself
+        if (location.pathname === "/blog") {
+          navigate(`/auth?returnTo=/blog`, { replace: true });
+        }
+      }
     });
     return () => subscription.unsubscribe();
-  }, []);
+  }, [navigate, location.pathname]);
+
+  // If not authenticated, show nothing so redirect works.
+  if (!user) {
+    return null;
+  }
 
   // Helper: Check if user is admin
   const [isAdmin, setIsAdmin] = useState(false);

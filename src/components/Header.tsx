@@ -98,7 +98,7 @@ const Header = () => {
               </button>
             ) : (
               <Link
-                to="/auth"
+                to="/blog"
                 className="text-blue-600 font-semibold border border-blue-500 px-4 py-2 rounded hover:bg-blue-50 transition"
               >
                 Staff Only
@@ -152,7 +152,7 @@ const Header = () => {
                 </button>
               ) : (
                 <Link
-                  to="/auth"
+                  to="/blog"
                   className="text-blue-600 font-semibold border border-blue-500 px-4 py-2 rounded hover:bg-blue-50 transition text-center"
                   onClick={() => setIsMenuOpen(false)}
                 >
