@@ -105,56 +105,7 @@ const Contact = () => {
               <h2 className="text-4xl font-bold text-gray-900 mb-4">Send Us a Message</h2>
               <p className="text-xl text-gray-600">Fill out the form below and we'll get back to you within 24 hours</p>
             </div>
-            <form className="bg-gray-50 p-8 rounded-lg shadow-lg border border-gray-200">
-              <div className="grid md:grid-cols-2 gap-6 mb-6">
-                <div>
-                  <label className="block text-gray-700 font-medium mb-2">First Name</label>
-                  <input
-                    type="text"
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-sm"
-                    placeholder="Enter your first name"
-                  />
-                </div>
-                <div>
-                  <label className="block text-gray-700 font-medium mb-2">Last Name</label>
-                  <input
-                    type="text"
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-sm"
-                    placeholder="Enter your last name"
-                  />
-                </div>
-              </div>
-              <div className="mb-6">
-                <label className="block text-gray-700 font-medium mb-2">Email</label>
-                <input
-                  type="email"
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-sm"
-                  placeholder="Enter your email address"
-                />
-              </div>
-              <div className="mb-6">
-                <label className="block text-gray-700 font-medium mb-2">Company</label>
-                <input
-                  type="text"
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-sm"
-                  placeholder="Enter your company name"
-                />
-              </div>
-              <div className="mb-6">
-                <label className="block text-gray-700 font-medium mb-2">Message</label>
-                <textarea
-                  rows={5}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-sm"
-                  placeholder="Tell us about your bookkeeping needs..."
-                ></textarea>
-              </div>
-              <button
-                type="submit"
-                className="w-full bg-gradient-to-r from-blue-500 to-blue-700 text-white py-4 rounded-lg font-medium hover:from-blue-600 hover:to-blue-800 transition-all duration-200 shadow-lg"
-              >
-                Send Message
-              </button>
-            </form>
+            <ContactForm />
           </div>
         </div>
       </section>
