@@ -9,12 +9,10 @@ import TaxReliefCards from "@/components/info/TaxReliefCards";
 import InfoContactCTA from "@/components/info/InfoContactCTA";
 
 const Info = () => {
-  // Remove selectedYear state and years array; always use "2024"
-  const selectedYear = "2024";
-  
+  // Remove selectedYear state and years array; show all years in all components now
   return (
     <div className="min-h-screen bg-white">
-      <InfoHero selectedYear={selectedYear} />
+      <InfoHero />
       {/* Tax Information Tabs */}
       <section className="py-20 bg-gray-50 relative">
         <div className="container mx-auto px-4 relative z-10">
@@ -31,13 +29,13 @@ const Info = () => {
               </TabsTrigger>
             </TabsList>
             <TabsContent value="individual" className="space-y-6">
-              <IndividualTaxRates selectedYear={selectedYear} />
+              <IndividualTaxRates />
             </TabsContent>
             <TabsContent value="corporate" className="space-y-6">
-              <CorporateTaxRates selectedYear={selectedYear} />
+              <CorporateTaxRates />
             </TabsContent>
             <TabsContent value="relief" className="space-y-6">
-              <TaxReliefCards selectedYear={selectedYear} />
+              <TaxReliefCards />
             </TabsContent>
           </Tabs>
         </div>
@@ -47,4 +45,3 @@ const Info = () => {
   );
 };
 export default Info;
-

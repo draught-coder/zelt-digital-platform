@@ -1,13 +1,9 @@
+
 import React from "react";
 import { Calendar } from "lucide-react";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 // Remove setSelectedYear and years from props
-interface InfoHeroProps {
-  selectedYear: string;
-}
-
-const InfoHero: React.FC<InfoHeroProps> = ({ selectedYear }) => (
+const InfoHero: React.FC = () => (
   <section className="relative py-20 shadow-lg overflow-hidden" style={{ minHeight: 380 }}>
     {/* Professional background image + overlay */}
     <div className="absolute inset-0 z-0">
@@ -32,7 +28,7 @@ const InfoHero: React.FC<InfoHeroProps> = ({ selectedYear }) => (
         </p>
         {/* Remove Year Selector */}
         <div className="flex items-center justify-center gap-4 bg-white/90 p-6 rounded-2xl shadow-lg max-w-md mx-auto border border-slate-200 backdrop-blur">
-          <span className="text-gray-800 font-medium">Assessment Year: <span className="text-blue-800 font-bold">{selectedYear}</span></span>
+          <span className="text-gray-800 font-medium">All Assessment Years</span>
         </div>
       </div>
     </div>
