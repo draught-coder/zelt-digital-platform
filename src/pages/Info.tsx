@@ -1,16 +1,36 @@
 
-// Refactored Info Page – loads new extracted components
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import InfoHero from "@/components/info/InfoHero";
 import IndividualTaxRates from "@/components/info/IndividualTaxRates";
 import CorporateTaxRates from "@/components/info/CorporateTaxRates";
 import TaxReliefCards from "@/components/info/TaxReliefCards";
 import InfoContactCTA from "@/components/info/InfoContactCTA";
+import { supabase } from "@/integrations/supabase/client";
 
 const Info = () => {
-  const [selectedYear, setSelectedYear] = useState("2024");
-  const years = ["2024", "2023", "2022", "2021"];
+  const [years, setYears] = useState<string[]>([]);
+  const [selectedYear, setSelectedYear] = useState<string>("");
+
+  // Fetch available years dynamically from Supabase
+  useEffect(() => {
+    const fetchYears = async () => {
+      const { data, error } = await supabase
+        .from('individual_tax_rates')
+        .select('year')
+        .order('year', { ascending: false });
+
+      if (!error && data) {
+        // Get unique years as strings
+        const uniqueYears = Array.from(
+          new Set(data.map((row) => typeof row.year === 'string' ? row.year : String(row.year)))
+        );
+        setYears(uniqueYears);
+        setSelectedYear(uniqueYears[0] ?? "");
+      }
+    };
+    fetchYears();
+  }, []);
 
   return (
     <div className="min-h-screen bg-white">
@@ -22,7 +42,6 @@ const Info = () => {
           <Tabs defaultValue="individual" className="max-w-6xl mx-auto">
             <TabsList className="grid w-full grid-cols-3 mb-8">
               <TabsTrigger value="individual" className="flex items-center gap-2">
-                {/* Avoid redundant icon import, handled by component */}
                 Individual Tax
               </TabsTrigger>
               <TabsTrigger value="corporate" className="flex items-center gap-2">
@@ -49,3 +68,4 @@ const Info = () => {
   );
 };
 export default Info;
+
