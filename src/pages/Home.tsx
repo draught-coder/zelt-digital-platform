@@ -51,7 +51,7 @@ const Home = () => {
             zIndex: 20, // set high to make visible
             opacity: 0.55, // higher opacity
             pointerEvents: 'none',
-            mixBlendMode: 'lighter', // adds more flair!
+            mixBlendMode: 'lighten', // FIXED: changed from 'lighter' to 'lighten' for TypeScript
           }}
         >
           <svg
