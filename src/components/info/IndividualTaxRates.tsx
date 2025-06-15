@@ -1,3 +1,4 @@
+
 import React from "react";
 import { Users } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
@@ -20,6 +21,17 @@ const fetchIndividualTaxRates = async (year: string) => {
   return data;
 };
 
+const getCategoryBorders = (taxRates: any[]) => {
+  // Returns an array with objects { isFirstInGroup, isLastInGroup }
+  return taxRates.map((rate, idx, arr) => {
+    const prev = idx > 0 ? arr[idx - 1].category : undefined;
+    const next = idx < arr.length - 1 ? arr[idx + 1].category : undefined;
+    const isFirstInGroup = prev !== rate.category;
+    const isLastInGroup = next !== rate.category;
+    return { isFirstInGroup, isLastInGroup };
+  });
+};
+
 const IndividualTaxRates: React.FC<IndividualTaxRatesProps> = ({ selectedYear }) => {
   const {
     data: taxRates,
@@ -31,6 +43,11 @@ const IndividualTaxRates: React.FC<IndividualTaxRatesProps> = ({ selectedYear })
     queryFn: () => fetchIndividualTaxRates(selectedYear),
     enabled: !!selectedYear,
   });
+
+  let borders: { isFirstInGroup: boolean; isLastInGroup: boolean }[] = [];
+  if (taxRates && taxRates.length > 0) {
+    borders = getCategoryBorders(taxRates);
+  }
 
   return (
     <div className="bg-white p-8 rounded-2xl shadow-lg">
@@ -64,16 +81,27 @@ const IndividualTaxRates: React.FC<IndividualTaxRatesProps> = ({ selectedYear })
               </TableRow>
             </TableHeader>
             <TableBody>
-              {taxRates?.map((rate, index) => (
-                <TableRow key={index}>
-                  <TableCell className="font-medium">{rate.category}</TableCell>
-                  <TableCell>{rate.chargeable_income}</TableCell>
-                  <TableCell>{rate.bracket_type}</TableCell>
-                  <TableCell>{rate.calculation}</TableCell>
-                  <TableCell>{rate.rate}</TableCell>
-                  <TableCell>{rate.tax_rm}</TableCell>
-                </TableRow>
-              ))}
+              {taxRates?.map((rate, index) => {
+                const { isFirstInGroup, isLastInGroup } = borders[index] || {};
+                // Compose additional border classes for grouping
+                const groupBorder =
+                  (isFirstInGroup ? "border-t-4 border-blue-400 rounded-t-xl " : "") +
+                  (isLastInGroup ? "border-b-4 border-blue-400 rounded-b-xl " : "") +
+                  "border-l-4 border-r-4 border-blue-200 ";
+                return (
+                  <TableRow
+                    key={index}
+                    className={groupBorder + "bg-white"}
+                  >
+                    <TableCell className="font-medium">{rate.category}</TableCell>
+                    <TableCell>{rate.chargeable_income}</TableCell>
+                    <TableCell>{rate.bracket_type}</TableCell>
+                    <TableCell>{rate.calculation}</TableCell>
+                    <TableCell>{rate.rate}</TableCell>
+                    <TableCell>{rate.tax_rm}</TableCell>
+                  </TableRow>
+                );
+              })}
             </TableBody>
           </Table>
         )}
@@ -83,3 +111,4 @@ const IndividualTaxRates: React.FC<IndividualTaxRatesProps> = ({ selectedYear })
 };
 
 export default IndividualTaxRates;
+
