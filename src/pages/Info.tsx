@@ -45,65 +45,33 @@ const Info = () => {
 
   return (
     <div className="min-h-screen bg-white">
-      {/* Hero Section with Financial Theme Background */}
-      <section className="bg-gradient-to-br from-emerald-50 via-white to-teal-50 py-20 shadow-lg relative overflow-hidden">
-        {/* Financial Pattern Background */}
-        <div className="absolute inset-0">
-          {/* Hexagon Pattern */}
-          <div className="absolute inset-0" style={{
-            backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23059669' fill-opacity='0.3'%3E%3Cpolygon points='30,15 45,25 45,45 30,55 15,45 15,25'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
-            backgroundSize: '60px 60px'
-          }}></div>
-          
-          {/* Floating Financial Icons */}
-          <div className="absolute top-16 left-16 text-emerald-200 opacity-20 animate-float">
-            <Calculator className="w-12 h-12" />
-          </div>
-          <div className="absolute top-32 right-20 text-teal-200 opacity-20 animate-float" style={{ animationDelay: '1s' }}>
-            <Receipt className="w-10 h-10" />
-          </div>
-          <div className="absolute bottom-24 left-1/4 text-emerald-300 opacity-20 animate-float" style={{ animationDelay: '2s' }}>
-            <Building2 className="w-14 h-14" />
-          </div>
-          <div className="absolute top-1/2 right-1/4 text-teal-300 opacity-20 animate-float" style={{ animationDelay: '0.5s' }}>
-            <Users className="w-8 h-8" />
-          </div>
-          
-          {/* Curved Lines */}
-          <div className="absolute top-0 left-0 w-full h-full">
-            <svg className="w-full h-full opacity-10" viewBox="0 0 800 600">
-              <path d="M0,300 Q200,100 400,300 T800,300" stroke="url(#gradient1)" strokeWidth="2" fill="none" />
-              <path d="M0,200 Q300,50 600,200 T800,200" stroke="url(#gradient2)" strokeWidth="1.5" fill="none" />
-              <defs>
-                <linearGradient id="gradient1" x1="0%" y1="0%" x2="100%" y2="0%">
-                  <stop offset="0%" stopColor="#10b981" />
-                  <stop offset="100%" stopColor="#14b8a6" />
-                </linearGradient>
-                <linearGradient id="gradient2" x1="0%" y1="0%" x2="100%" y2="0%">
-                  <stop offset="0%" stopColor="#14b8a6" />
-                  <stop offset="100%" stopColor="#10b981" />
-                </linearGradient>
-              </defs>
-            </svg>
-          </div>
+      {/* Hero Section with Professional Photo Background */}
+      <section className="relative py-20 shadow-lg overflow-hidden" style={{ minHeight: 380 }}>
+        {/* Professional background image + overlay */}
+        <div className="absolute inset-0 z-0">
+          <img
+            src="https://images.unsplash.com/photo-1488590528505-98d2b5aba04b?auto=format&fit=crop&w=1200&q=80"
+            alt="Modern financial background"
+            className="w-full h-full object-cover"
+            style={{ objectPosition: 'center' }}
+          />
+          <div className="absolute inset-0 bg-gradient-to-tr from-white/90 via-slate-100/90 to-blue-100/60 backdrop-blur-[1px]"></div>
         </div>
-
         <div className="container mx-auto px-4 relative z-10">
           <div className="text-center max-w-4xl mx-auto">
-            <h1 className="text-5xl md:text-6xl font-bold text-gray-900 mb-6">
+            <h1 className="text-5xl md:text-6xl font-bold text-gray-900 mb-6 drop-shadow-lg">
               Malaysian Tax
-              <span className="bg-gradient-to-r from-blue-500 to-blue-700 bg-clip-text text-transparent block">
+              <span className="bg-gradient-to-r from-blue-600 to-blue-900 bg-clip-text text-transparent block">
                 Information Hub
               </span>
             </h1>
-            <p className="text-xl text-gray-600 mb-8">
+            <p className="text-xl text-gray-700 mb-8 font-medium drop-shadow">
               Complete guide to Malaysian tax rates and reliefs for individuals and corporations
             </p>
-            
             {/* Year Selector */}
-            <div className="flex items-center justify-center gap-4 bg-white p-6 rounded-2xl shadow-lg max-w-md mx-auto">
-              <Calendar className="w-5 h-5 text-blue-600" />
-              <span className="text-gray-700 font-medium">Assessment Year:</span>
+            <div className="flex items-center justify-center gap-4 bg-white/90 p-6 rounded-2xl shadow-lg max-w-md mx-auto border border-slate-200 backdrop-blur">
+              <Calendar className="w-5 h-5 text-blue-700" />
+              <span className="text-gray-800 font-medium">Assessment Year:</span>
               <Select value={selectedYear} onValueChange={setSelectedYear}>
                 <SelectTrigger className="w-32 bg-white">
                   <SelectValue />
