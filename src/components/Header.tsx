@@ -1,11 +1,33 @@
-
-import React, { useState } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Menu, X } from 'lucide-react';
+import { supabase } from "@/integrations/supabase/client";
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const location = useLocation();
+
+  // Auth state
+  const [user, setUser] = useState(null);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    // Set up auth state listener first
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      (_, session) => {
+        setUser(session?.user ?? null);
+      }
+    );
+    // Get current
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setUser(session?.user ?? null);
+    });
+    return () => subscription.unsubscribe();
+  }, []);
+
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    navigate("/", { replace: true });
+  };
 
   const navItems = [
     { name: 'Home', path: '/' },
@@ -17,6 +39,8 @@ const Header = () => {
   ];
 
   const isActive = (path: string) => location.pathname === path;
+
+  const location = useLocation();
 
   return (
     <header className="fixed top-0 w-full bg-white/95 backdrop-blur-sm z-50 shadow-md">
@@ -44,8 +68,8 @@ const Header = () => {
                 to={item.path}
                 className={`text-sm font-medium transition-colors duration-200 ${
                   isActive(item.path)
-                    ? 'text-blue-600 border-b-2 border-blue-600'
-                    : 'text-gray-600 hover:text-blue-600'
+                    ? "text-blue-600 border-b-2 border-blue-600"
+                    : "text-gray-600 hover:text-blue-600"
                 }`}
               >
                 {item.name}
@@ -61,6 +85,25 @@ const Header = () => {
             >
               Start Digital Journey
             </Link>
+          </div>
+
+          {/* Auth buttons */}
+          <div className="hidden md:block ml-4">
+            {user ? (
+              <button
+                onClick={handleLogout}
+                className="text-gray-700 font-semibold border border-gray-300 px-4 py-2 rounded hover:bg-gray-100 transition"
+              >
+                Log out
+              </button>
+            ) : (
+              <Link
+                to="/auth"
+                className="text-blue-600 font-semibold border border-blue-500 px-4 py-2 rounded hover:bg-blue-50 transition"
+              >
+                Log in
+              </Link>
+            )}
           </div>
 
           {/* Mobile Menu Button */}
@@ -82,8 +125,8 @@ const Header = () => {
                   to={item.path}
                   className={`text-sm font-medium transition-colors duration-200 ${
                     isActive(item.path)
-                      ? 'text-blue-600'
-                      : 'text-gray-600 hover:text-blue-600'
+                      ? "text-blue-600"
+                      : "text-gray-600 hover:text-blue-600"
                   }`}
                   onClick={() => setIsMenuOpen(false)}
                 >
@@ -97,6 +140,25 @@ const Header = () => {
               >
                 Start Digital Journey
               </Link>
+              {user ? (
+                <button
+                  onClick={() => {
+                    setIsMenuOpen(false);
+                    handleLogout();
+                  }}
+                  className="text-gray-700 font-semibold border border-gray-300 px-4 py-2 rounded hover:bg-gray-100 transition"
+                >
+                  Log out
+                </button>
+              ) : (
+                <Link
+                  to="/auth"
+                  className="text-blue-600 font-semibold border border-blue-500 px-4 py-2 rounded hover:bg-blue-50 transition text-center"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  Log in
+                </Link>
+              )}
             </div>
           </nav>
         )}
