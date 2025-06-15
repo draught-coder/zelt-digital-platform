@@ -1,7 +1,6 @@
-
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowRight, Zap, Camera, BarChart3, Shield } from 'lucide-react';
+import { ArrowRight, Camera, BarChart3, Shield } from 'lucide-react';
 import useParallax from '../hooks/useParallax';
 
 const Home = () => {
@@ -26,14 +25,13 @@ const Home = () => {
   ];
 
   return (
-    // Layered unified background using blue-purple-slate gradient and subtle patterns.
+    // Layered unified background using blue-purple-slate gradient and a neon grid.
     <div className="min-h-screen w-full relative overflow-x-hidden"
       style={{
         background: 'linear-gradient(120deg, #111d2b 0%, #223963 30%, #2952a3 55%, #5f3ba4 90%, #22113b 100%)',
-        // fallback solid, in case gradient isn't supported
       }}
     >
-      {/* Parallax and decorative backgrounds (as before) */}
+      {/* Parallax and decorative backgrounds */}
       <div className="fixed top-0 left-0 h-screen w-full -z-10 pointer-events-none select-none">
         {/* Gradient overlay */}
         <div
@@ -45,58 +43,98 @@ const Home = () => {
             zIndex: 1,
           }}
         />
-        {/* Parallax grid pattern */}
+        {/* Neon Futuristic Grid (SVG) */}
         <div
           data-parallax-depth="2"
           className="absolute inset-0"
           style={{
             zIndex: 2,
+            opacity: 0.23,
+            pointerEvents: 'none'
+          }}
+        >
+          <svg
+            width="100%"
+            height="100%"
+            viewBox="0 0 1920 1080"
+            preserveAspectRatio="none"
+            style={{
+              width: '100%',
+              height: '100%',
+              display: 'block',
+            }}
+          >
+            {/* Vertical lines */}
+            {[...Array(22)].map((_, i) => (
+              <line
+                key={`v${i}`}
+                x1={(i * 96).toString()}
+                y1="0"
+                x2={(i * 96).toString()}
+                y2="1080"
+                stroke="#54d3fc"
+                strokeWidth="1.5"
+                opacity={i % 4 === 0 ? 0.28 : 0.13}
+                style={{ filter: 'drop-shadow(0 0 8px #7edbfe)' }}
+              />
+            ))}
+            {/* Horizontal lines */}
+            {[...Array(13)].map((_, i) => (
+              <line
+                key={`h${i}`}
+                x1="0"
+                y1={(i * 88).toString()}
+                x2="1920"
+                y2={(i * 88).toString()}
+                stroke="#bb9aff"
+                strokeWidth="1.5"
+                opacity={i % 3 === 0 ? 0.23 : 0.10}
+                style={{ filter: 'drop-shadow(0 0 8px #c7b3ff)' }}
+              />
+            ))}
+            {/* Edge glow */}
+            <rect
+              x="0" y="0" width="1920" height="1080"
+              fill="none"
+              stroke="#8b5cf6"
+              strokeWidth="22"
+              opacity="0.15"
+              rx="40"
+              style={{ filter: 'drop-shadow(0 0 38px #a993fe)' }}
+            />
+          </svg>
+        </div>
+        {/* Parallax grid pattern from before (keep) */}
+        <div
+          data-parallax-depth="3"
+          className="absolute inset-0"
+          style={{
+            zIndex: 3,
             backgroundImage: `
               linear-gradient(rgba(59,130,246,0.12) 1px, transparent 1px),
               linear-gradient(90deg, rgba(147,51,234,0.07) 1px, transparent 1px)
             `,
             backgroundSize: '72px 72px, 160px 160px',
-            opacity: 0.25,
+            opacity: 0.13,
           }}
         />
-        {/* Decorative shapes, parallax */}
-        <div
-          data-parallax-depth="4"
-          className="absolute top-28 left-10 w-40 h-40 border-2 border-blue-400 rounded-full opacity-20 animate-pulse"
-          style={{ zIndex: 3 }}
-        />
-        <div
-          data-parallax-depth="6"
-          className="absolute top-48 right-24 w-28 h-28 bg-gradient-to-br from-purple-400 to-blue-500 rounded-lg rotate-45 opacity-25 animate-spin"
-          style={{ zIndex: 4, animationDuration: '19s' }}
-        />
-        <div
-          data-parallax-depth="5"
-          className="absolute bottom-16 left-1/4 w-24 h-24 border-4 border-purple-400 rotate-12 opacity-20 animate-bounce"
-          style={{ zIndex: 5 }}
-        />
-        <div
-          data-parallax-depth="3"
-          className="absolute top-1/3 right-1/3 w-32 h-32 border-2 border-cyan-300 rounded-full opacity-15 animate-pulse"
-          style={{ zIndex: 6 }}
-        />
-        {/* Light beams */}
+        {/* Light beams (keep, slightly more subtle) */}
         <div
           data-parallax-depth="2"
-          className="absolute top-0 left-1/4 w-px h-full bg-gradient-to-b from-transparent via-blue-400 to-transparent opacity-20 animate-pulse"
-          style={{ zIndex: 7 }}
+          className="absolute top-0 left-1/4 w-px h-full bg-gradient-to-b from-transparent via-blue-400 to-transparent opacity-15 animate-pulse"
+          style={{ zIndex: 4 }}
         />
         <div
           data-parallax-depth="3"
-          className="absolute top-0 right-1/3 w-px h-full bg-gradient-to-b from-transparent via-purple-400 to-transparent opacity-10 animate-pulse"
-          style={{ animationDelay: '1s', zIndex: 8 }}
+          className="absolute top-0 right-1/3 w-px h-full bg-gradient-to-b from-transparent via-purple-400 to-transparent opacity-7 animate-pulse"
+          style={{ animationDelay: '1s', zIndex: 5 }}
         />
         <div
           data-parallax-depth="4"
-          className="absolute top-0 left-3/4 w-px h-full bg-gradient-to-b from-transparent via-cyan-400 to-transparent opacity-15 animate-pulse"
-          style={{ animationDelay: '2s', zIndex: 9 }}
+          className="absolute top-0 left-3/4 w-px h-full bg-gradient-to-b from-transparent via-cyan-400 to-transparent opacity-10 animate-pulse"
+          style={{ animationDelay: '2s', zIndex: 6 }}
         />
-        {/* Subtle noise overlay */}
+        {/* Subtle noise overlay (keep) */}
         <div
           className="absolute inset-0"
           style={{
@@ -186,4 +224,3 @@ const Home = () => {
 };
 
 export default Home;
-
