@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Mail, Phone, MessageCircle, MapPin, Clock, Bot } from 'lucide-react';
 
@@ -7,34 +6,35 @@ const Contact = () => {
     {
       icon: <MessageCircle className="w-6 h-6" />,
       title: "WhatsApp",
-      details: "+60 12-345-6789",
+      details: "+60 12-378-3557",
       action: "Chat Now",
-      link: "https://wa.me/60123456789",
+      link: "https://wa.me/60123783557",
       color: "bg-green-500 hover:bg-green-600"
     },
     {
       icon: <Mail className="w-6 h-6" />,
       title: "Email",
-      details: "hello@ibnzelt.com",
+      details: "ashraf@ibnzelt.com",
       action: "Send Email",
-      link: "mailto:hello@ibnzelt.com",
+      link: "mailto:ashraf@ibnzelt.com",
       color: "bg-blue-500 hover:bg-blue-600"
     },
     {
       icon: <Phone className="w-6 h-6" />,
       title: "Phone",
-      details: "+60 3-1234-5678",
+      details: "1-700-81-9747",
       action: "Call Now",
-      link: "tel:+60312345678",
+      link: "tel:1700819747",
       color: "bg-purple-500 hover:bg-purple-600"
     },
     {
       icon: <Bot className="w-6 h-6" />,
       title: "AI Chatbot",
-      details: "24/7 Instant Support",
-      action: "Start Chat",
+      details: "Coming Soon",
+      action: "Coming Soon",
       link: "#chatbot",
-      color: "bg-orange-500 hover:bg-orange-600"
+      color: "bg-orange-300 cursor-not-allowed",
+      disabled: true
     }
   ];
 
@@ -70,19 +70,27 @@ const Contact = () => {
                 <div className="text-gray-700 mb-4 flex justify-center">{method.icon}</div>
                 <h3 className="text-xl font-semibold text-gray-900 mb-2">{method.title}</h3>
                 <p className="text-gray-600 mb-6">{method.details}</p>
-                <a
-                  href={method.link}
-                  target={method.title === "WhatsApp" ? "_blank" : undefined}
-                  rel={method.title === "WhatsApp" ? "noopener noreferrer" : undefined}
-                  className={`${method.color} text-white px-6 py-3 rounded-lg font-medium transition-all duration-200 inline-block shadow-lg`}
-                  onClick={method.title === "AI Chatbot" ? (e) => {
-                    e.preventDefault();
-                    // Here you would integrate with your chatbot service
-                    alert("Chatbot integration would be implemented here");
-                  } : undefined}
-                >
-                  {method.action}
-                </a>
+                {!method.disabled ? (
+                  <a
+                    href={method.link}
+                    target={method.title === "WhatsApp" ? "_blank" : undefined}
+                    rel={method.title === "WhatsApp" ? "noopener noreferrer" : undefined}
+                    className={`${method.color} text-white px-6 py-3 rounded-lg font-medium transition-all duration-200 inline-block shadow-lg`}
+                    onClick={method.title === "AI Chatbot" ? (e) => {
+                      e.preventDefault();
+                      alert("Chatbot integration would be implemented here");
+                    } : undefined}
+                  >
+                    {method.action}
+                  </a>
+                ) : (
+                  <button
+                    disabled
+                    className={`${method.color} text-white px-6 py-3 rounded-lg font-medium inline-block shadow-lg opacity-70`}
+                  >
+                    {method.action}
+                  </button>
+                )}
               </div>
             ))}
           </div>
