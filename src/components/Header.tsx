@@ -101,7 +101,7 @@ const Header = () => {
                 to="/auth"
                 className="text-blue-600 font-semibold border border-blue-500 px-4 py-2 rounded hover:bg-blue-50 transition"
               >
-                Log in
+                Staff Only
               </Link>
             )}
           </div>
@@ -156,7 +156,7 @@ const Header = () => {
                   className="text-blue-600 font-semibold border border-blue-500 px-4 py-2 rounded hover:bg-blue-50 transition text-center"
                   onClick={() => setIsMenuOpen(false)}
                 >
-                  Log in
+                  Staff Only
                 </Link>
               )}
             </div>

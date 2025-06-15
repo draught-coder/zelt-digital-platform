@@ -8,14 +8,12 @@ import { toast } from "@/components/ui/sonner";
 
 const AuthPage = () => {
   const [loading, setLoading] = useState(false);
-  const [variant, setVariant] = useState<"login" | "signup">("login");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [errorMsg, setErrorMsg] = useState("");
   const navigate = useNavigate();
 
   useEffect(() => {
-    // redirect if already logged in
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (session) {
         navigate("/", { replace: true });
@@ -28,29 +26,13 @@ const AuthPage = () => {
     setErrorMsg("");
     setLoading(true);
 
-    if (variant === "signup") {
-      const redirectUrl = `${window.location.origin}/`;
-      const { error } = await supabase.auth.signUp({
-        email,
-        password,
-        options: { emailRedirectTo: redirectUrl },
-      });
-      if (error) {
-        setErrorMsg(error.message);
-      } else {
-        toast("Success", {
-          description: "Signup successful! Please check your email to confirm.",
-        });
-        setVariant("login");
-      }
+    // Only login allowed, signup is removed
+    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    if (error) {
+      setErrorMsg("Invalid credentials or user not confirmed.");
     } else {
-      const { error } = await supabase.auth.signInWithPassword({ email, password });
-      if (error) {
-        setErrorMsg("Invalid credentials or user not confirmed.");
-      } else {
-        toast("Success", { description: "Logged in. Redirecting..." });
-        navigate("/", { replace: true });
-      }
+      toast("Success", { description: "Logged in. Redirecting..." });
+      navigate("/", { replace: true });
     }
 
     setLoading(false);
@@ -60,7 +42,7 @@ const AuthPage = () => {
     <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-blue-950 to-purple-900">
       <div className="w-full max-w-md bg-white/90 rounded-lg shadow-2xl p-8">
         <h2 className="text-2xl font-bold text-center mb-4 text-gray-900">
-          {variant === "login" ? "Login" : "Sign Up"} to Ibn Zelt
+          Staff Login
         </h2>
         <form onSubmit={handleSubmit} className="space-y-5">
           <div>
@@ -96,26 +78,9 @@ const AuthPage = () => {
           >
             {loading
               ? "Please wait..."
-              : variant === "login"
-              ? "Login"
-              : "Sign up"}
+              : "Login"}
           </Button>
         </form>
-
-        <div className="flex flex-col items-center gap-2 mt-8">
-          <span className="text-gray-700">
-            {variant === "login"
-              ? "Don't have an account?"
-              : "Already have an account?"}
-          </span>
-          <button
-            className="text-blue-600 font-semibold hover:underline"
-            disabled={loading}
-            onClick={() => setVariant(variant === "login" ? "signup" : "login")}
-          >
-            {variant === "login" ? "Sign up" : "Login"}
-          </button>
-        </div>
       </div>
     </div>
   );
