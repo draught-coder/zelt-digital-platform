@@ -1,4 +1,3 @@
-
 // Refactored Info Page – loads new extracted components
 import React, { useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -10,7 +9,8 @@ import InfoContactCTA from "@/components/info/InfoContactCTA";
 
 const Info = () => {
   const [selectedYear, setSelectedYear] = useState("2024");
-  const years = ["2024", "2023", "2022", "2021"];
+  // Update: show years from 2025 down to 2019 (so latest at top)
+  const years = ["2025", "2024", "2023", "2022", "2021", "2020", "2019"];
 
   return (
     <div className="min-h-screen bg-white">
