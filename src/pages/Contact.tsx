@@ -1,5 +1,6 @@
 import React from 'react';
 import { Mail, Phone, MessageCircle, MapPin, Clock, Bot } from 'lucide-react';
+import ContactForm from "@/components/ContactForm";
 
 const Contact = () => {
   const contactMethods = [
