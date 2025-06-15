@@ -68,9 +68,9 @@ export type Database = {
           bracket_type: string | null
           calculation: string | null
           category: string | null
+          chargeable_income: string | null
           id: string
           rate: string | null
-          statutory_income: string | null
           tax_rm: string | null
           year: string
         }
@@ -78,9 +78,9 @@ export type Database = {
           bracket_type?: string | null
           calculation?: string | null
           category?: string | null
+          chargeable_income?: string | null
           id?: string
           rate?: string | null
-          statutory_income?: string | null
           tax_rm?: string | null
           year?: string
         }
@@ -88,9 +88,9 @@ export type Database = {
           bracket_type?: string | null
           calculation?: string | null
           category?: string | null
+          chargeable_income?: string | null
           id?: string
           rate?: string | null
-          statutory_income?: string | null
           tax_rm?: string | null
           year?: string
         }
