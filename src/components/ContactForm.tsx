@@ -9,9 +9,9 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/components/ui/use-toast";
 
+// Only one name field now
 const schema = z.object({
-  first_name: z.string().min(1, { message: "First name is required" }),
-  last_name: z.string().min(1, { message: "Last name is required" }),
+  name: z.string().min(1, { message: "Name is required" }),
   email: z.string().min(1, { message: "Email is required" }).email("Invalid email"),
   company: z.string().optional(),
   contact_number: z.string().optional(),
@@ -27,8 +27,8 @@ const ContactForm: React.FC = () => {
 
   const onSubmit = async (data: ContactFormValues) => {
     const { error } = await supabase.from("contact_messages").insert({
-      first_name: data.first_name,
-      last_name: data.last_name,
+      first_name: data.name, // store in first_name
+      last_name: "",         // since we removed it, leave blank
       email: data.email,
       company: data.company || null,
       contact_number: data.contact_number || null,
@@ -52,22 +52,20 @@ const ContactForm: React.FC = () => {
   return (
     <Form {...form}>
       <form
-        className="bg-white p-5 md:p-6 rounded-xl shadow border border-gray-100 max-w-full space-y-4 transition-all"
+        className="bg-white p-4 md:p-5 rounded-lg shadow-md border border-gray-100 max-w-full space-y-3"
         onSubmit={form.handleSubmit(onSubmit)}
       >
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
           <FormField
             control={form.control}
-            name="first_name"
+            name="name"
             render={({ field }) => (
               <FormItem>
-                <FormLabel className="text-sm font-semibold text-gray-800">
-                  First Name
-                </FormLabel>
+                <FormLabel className="text-sm font-semibold text-gray-800">Name</FormLabel>
                 <FormControl>
                   <Input
-                    placeholder="First name"
-                    className="h-9 px-3 py-1.5 rounded-md bg-gray-50 text-gray-900 border-none focus:ring-2 focus:ring-blue-400 focus:bg-white"
+                    placeholder="Your name"
+                    className="h-9 px-3 py-1.5 rounded bg-gray-50 text-gray-900 border-none focus:ring-2 focus:ring-blue-400 focus:bg-white"
                     {...field}
                   />
                 </FormControl>
@@ -77,16 +75,15 @@ const ContactForm: React.FC = () => {
           />
           <FormField
             control={form.control}
-            name="last_name"
+            name="email"
             render={({ field }) => (
               <FormItem>
-                <FormLabel className="text-sm font-semibold text-gray-800">
-                  Last Name
-                </FormLabel>
+                <FormLabel className="text-sm font-semibold text-gray-800">Email</FormLabel>
                 <FormControl>
                   <Input
-                    placeholder="Last name"
-                    className="h-9 px-3 py-1.5 rounded-md bg-gray-50 text-gray-900 border-none focus:ring-2 focus:ring-blue-400 focus:bg-white"
+                    type="email"
+                    placeholder="you@email.com"
+                    className="h-9 px-3 py-1.5 rounded bg-gray-50 text-gray-900 border-none focus:ring-2 focus:ring-blue-400 focus:bg-white"
                     {...field}
                   />
                 </FormControl>
@@ -95,27 +92,7 @@ const ContactForm: React.FC = () => {
             )}
           />
         </div>
-        <div className="grid gap-3 md:grid-cols-2">
-          <FormField
-            control={form.control}
-            name="email"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel className="text-sm font-semibold text-gray-800">
-                  Email
-                </FormLabel>
-                <FormControl>
-                  <Input
-                    type="email"
-                    placeholder="you@email.com"
-                    className="h-9 px-3 py-1.5 rounded-md bg-gray-50 text-gray-900 border-none focus:ring-2 focus:ring-blue-400 focus:bg-white"
-                    {...field}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+        <div className="grid md:grid-cols-2 gap-2">
           <FormField
             control={form.control}
             name="company"
@@ -127,7 +104,7 @@ const ContactForm: React.FC = () => {
                 <FormControl>
                   <Input
                     placeholder="Company name"
-                    className="h-9 px-3 py-1.5 rounded-md bg-gray-50 text-gray-900 border-none focus:ring-2 focus:ring-blue-400 focus:bg-white"
+                    className="h-9 px-3 py-1.5 rounded bg-gray-50 text-gray-900 border-none focus:ring-2 focus:ring-blue-400 focus:bg-white"
                     {...field}
                   />
                 </FormControl>
@@ -135,8 +112,6 @@ const ContactForm: React.FC = () => {
               </FormItem>
             )}
           />
-        </div>
-        <div className="grid gap-3 md:grid-cols-2">
           <FormField
             control={form.control}
             name="contact_number"
@@ -148,7 +123,7 @@ const ContactForm: React.FC = () => {
                 <FormControl>
                   <Input
                     placeholder="Phone or WhatsApp"
-                    className="h-9 px-3 py-1.5 rounded-md bg-gray-50 text-gray-900 border-none focus:ring-2 focus:ring-blue-400 focus:bg-white"
+                    className="h-9 px-3 py-1.5 rounded bg-gray-50 text-gray-900 border-none focus:ring-2 focus:ring-blue-400 focus:bg-white"
                     {...field}
                   />
                 </FormControl>
@@ -162,14 +137,12 @@ const ContactForm: React.FC = () => {
           name="message"
           render={({ field }) => (
             <FormItem>
-              <FormLabel className="text-sm font-semibold text-gray-800">
-                Message
-              </FormLabel>
+              <FormLabel className="text-sm font-semibold text-gray-800">Message</FormLabel>
               <FormControl>
                 <Textarea
                   placeholder="Tell us about your bookkeeping needs…"
-                  rows={4}
-                  className="min-h-[42px] rounded-md px-3 py-2 bg-gray-50 text-gray-900 border-none focus:ring-2 focus:ring-blue-400 focus:bg-white"
+                  rows={3}
+                  className="min-h-[38px] rounded px-3 py-2 bg-gray-50 text-gray-900 border-none focus:ring-2 focus:ring-blue-400 focus:bg-white"
                   {...field}
                 />
               </FormControl>
@@ -180,7 +153,7 @@ const ContactForm: React.FC = () => {
         <div className="flex justify-end">
           <button
             type="submit"
-            className="bg-blue-600 hover:bg-blue-700 text-white py-2 px-6 rounded-md font-semibold shadow-sm text-sm transition-all min-w-[120px] focus:outline-none focus:ring-2 focus:ring-blue-400"
+            className="bg-blue-600 hover:bg-blue-700 text-white py-2 px-5 rounded font-semibold shadow-sm text-sm transition-all min-w-[98px] focus:outline-none focus:ring-2 focus:ring-blue-400"
             disabled={form.formState.isSubmitting}
           >
             {form.formState.isSubmitting ? "Sending..." : "Send"}
@@ -192,3 +165,4 @@ const ContactForm: React.FC = () => {
 };
 
 export default ContactForm;
+
