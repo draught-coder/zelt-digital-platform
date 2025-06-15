@@ -13,6 +13,7 @@ import BlogPostEditor from "./blog/BlogPostEditor";
 import NewsletterSignup from "./blog/NewsletterSignup";
 
 const Blog = () => {
+  // HOOKS MUST RUN FIRST!
   const [searchTerm, setSearchTerm] = useState('');
   const [session, setSession] = useState<any>(null);
   const [user, setUser] = useState<any>(null);
@@ -33,6 +34,9 @@ const Blog = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
+  // Admin state
+  const [isAdmin, setIsAdmin] = useState(false);
+
   // Fetch session and subscribe to auth updates
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
@@ -52,11 +56,6 @@ const Blog = () => {
     return () => subscription.unsubscribe();
   }, [navigate, location.pathname]);
 
-  // If not authenticated, show nothing so redirect works.
-  if (!user) return null;
-
-  // Admin state
-  const [isAdmin, setIsAdmin] = useState(false);
   useEffect(() => {
     if (!user) { setIsAdmin(false); return; }
     supabase
@@ -174,6 +173,9 @@ const Blog = () => {
     }
   };
 
+  // === Only NOW, after all hooks, check auth for render ===
+  if (!user) return null;
+
   return (
     <div className="min-h-screen bg-white">
       {/* Hero Section */}
@@ -282,3 +284,4 @@ const Blog = () => {
 };
 
 export default Blog;
+
