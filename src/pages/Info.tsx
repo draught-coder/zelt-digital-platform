@@ -1,6 +1,6 @@
 
 // Refactored Info Page – loads new extracted components
-import React, { useState } from 'react';
+import React from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import InfoHero from "@/components/info/InfoHero";
 import IndividualTaxRates from "@/components/info/IndividualTaxRates";
@@ -9,20 +9,18 @@ import TaxReliefCards from "@/components/info/TaxReliefCards";
 import InfoContactCTA from "@/components/info/InfoContactCTA";
 
 const Info = () => {
-  const [selectedYear, setSelectedYear] = useState("2024");
-  const years = ["2024", "2023", "2022", "2021"];
-
+  // Remove selectedYear state and years array; always use "2024"
+  const selectedYear = "2024";
+  
   return (
     <div className="min-h-screen bg-white">
-      <InfoHero selectedYear={selectedYear} setSelectedYear={setSelectedYear} years={years} />
-
+      <InfoHero selectedYear={selectedYear} />
       {/* Tax Information Tabs */}
       <section className="py-20 bg-gray-50 relative">
         <div className="container mx-auto px-4 relative z-10">
           <Tabs defaultValue="individual" className="max-w-6xl mx-auto">
             <TabsList className="grid w-full grid-cols-3 mb-8">
               <TabsTrigger value="individual" className="flex items-center gap-2">
-                {/* Avoid redundant icon import, handled by component */}
                 Individual Tax
               </TabsTrigger>
               <TabsTrigger value="corporate" className="flex items-center gap-2">
@@ -49,3 +47,4 @@ const Info = () => {
   );
 };
 export default Info;
+
