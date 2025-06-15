@@ -187,6 +187,10 @@ const Blog = () => {
 
   return (
     <div className="min-h-screen bg-white">
+      {/* DEBUG BAR: show admin/user info */}
+      <div className="fixed top-0 left-0 z-50 bg-black text-white text-xs px-4 py-1 opacity-80">
+        USER: {user?.email || user?.id} | ADMIN: {String(isAdmin)}
+      </div>
       {/* Hero Section */}
       <section className="bg-white py-20 shadow-lg">
         <div className="container mx-auto px-4">
