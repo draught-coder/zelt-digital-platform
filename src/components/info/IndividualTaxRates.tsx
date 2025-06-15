@@ -75,8 +75,18 @@ const IndividualTaxRates: React.FC<IndividualTaxRatesProps> = ({ selectedYear })
           </Table>
         )}
       </div>
+      {/* Debug: Show raw taxRates array as JSON if data is loaded */}
+      {taxRates && taxRates.length > 0 && (
+        <div className="mt-8">
+          <h3 className="text-lg font-semibold mb-2 text-gray-800">Raw Tax Rates Array (Debug)</h3>
+          <pre className="bg-gray-100 max-w-full overflow-x-auto rounded p-4 text-xs text-gray-700">
+            {JSON.stringify(taxRates, null, 2)}
+          </pre>
+        </div>
+      )}
     </div>
   );
 };
 
 export default IndividualTaxRates;
+
