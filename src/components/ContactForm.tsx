@@ -77,6 +77,7 @@ const ContactForm: React.FC = () => {
                   <Input
                     placeholder="Your name"
                     className="h-9 px-3 py-1.5 rounded bg-gray-50 text-gray-900 border-none focus:ring-2 focus:ring-blue-400 focus:bg-white"
+                    autoComplete="name"
                     {...field}
                   />
                 </FormControl>
@@ -95,6 +96,7 @@ const ContactForm: React.FC = () => {
                     type="email"
                     placeholder="you@email.com"
                     className="h-9 px-3 py-1.5 rounded bg-gray-50 text-gray-900 border-none focus:ring-2 focus:ring-blue-400 focus:bg-white"
+                    autoComplete="email"
                     {...field}
                   />
                 </FormControl>
@@ -116,6 +118,7 @@ const ContactForm: React.FC = () => {
                   <Input
                     placeholder="Company name"
                     className="h-9 px-3 py-1.5 rounded bg-gray-50 text-gray-900 border-none focus:ring-2 focus:ring-blue-400 focus:bg-white"
+                    autoComplete="organization"
                     {...field}
                   />
                 </FormControl>
@@ -135,6 +138,7 @@ const ContactForm: React.FC = () => {
                   <Input
                     placeholder="Phone or WhatsApp"
                     className="h-9 px-3 py-1.5 rounded bg-gray-50 text-gray-900 border-none focus:ring-2 focus:ring-blue-400 focus:bg-white"
+                    autoComplete="tel"
                     {...field}
                   />
                 </FormControl>
