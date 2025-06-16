@@ -13,6 +13,7 @@ const Blog = () => {
   const [session, setSession] = useState<any>(null);
   const [user, setUser] = useState<any>(null);
   const [isAdmin, setIsAdmin] = useState(false);
+  const [isCheckingRole, setIsCheckingRole] = useState(true);
 
   const navigate = useNavigate();
   const location = useLocation();
@@ -42,7 +43,13 @@ const Blog = () => {
   }, [navigate, location.pathname]);
 
   useEffect(() => {
-    if (!user) { setIsAdmin(false); return; }
+    if (!user) { 
+      setIsAdmin(false); 
+      setIsCheckingRole(false);
+      return; 
+    }
+    
+    setIsCheckingRole(true);
     supabase
       .from("user_roles")
       .select("role, user_id")
@@ -50,8 +57,16 @@ const Blog = () => {
       .then(({ data, error }) => {
         const isUserAdmin = Array.isArray(data) && data.some((row) => row.role === "admin");
         setIsAdmin(isUserAdmin);
+        setIsCheckingRole(false);
+        
+        // Redirect based on admin status
+        if (isUserAdmin) {
+          navigate('/blog/admin', { replace: true });
+        } else {
+          navigate('/blog/posts', { replace: true });
+        }
       });
-  }, [user]);
+  }, [user, navigate]);
 
   // Fetch blog posts for main display section (for everyone)
   const { data: blogPosts, isLoading } = useQuery({
@@ -73,21 +88,20 @@ const Blog = () => {
     (post.category || '').toLowerCase().includes(searchTerm.toLowerCase())
   ) || [];
 
-  if (!user) return null;
-
-  return (
-    <div className="min-h-screen bg-white">
-      {/* DEBUG BAR: show admin/user info */}
-      <div className="fixed top-0 left-0 z-50 bg-black text-white text-xs px-4 py-1 opacity-80">
-        USER: {user?.email || user?.id} | ADMIN: {String(isAdmin)}
+  if (!user || isCheckingRole) {
+    return (
+      <div className="min-h-screen bg-white flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Loading...</p>
+        </div>
       </div>
-      <BlogHero searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
-      <BlogAdminSection isAdmin={isAdmin} />
-      <BlogPostGrid posts={filteredPosts} isLoading={isLoading} />
-      <NewsletterSignup />
-    </div>
-  );
+    );
+  }
+
+  // This component now only serves as a redirect handler
+  // The actual content will be shown in separate routes
+  return null;
 };
 
 export default Blog;
-
