@@ -1,4 +1,3 @@
-
 import React from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -26,25 +25,38 @@ const ContactForm: React.FC = () => {
   });
 
   const onSubmit = async (data: ContactFormValues) => {
-    const { error } = await supabase.from("contact_messages").insert({
-      Name: data.name, // Only this, as per schema
-      email: data.email,
-      company: data.company || null,
-      contact_number: data.contact_number || null,
-      message: data.message,
-    });
-    if (error) {
+    try {
+      console.log('Submitting form data:', data);
+      
+      const { error } = await supabase.from("contact_messages").insert({
+        Name: data.name,
+        email: data.email,
+        company: data.company || null,
+        contact_number: data.contact_number || null,
+        message: data.message,
+      });
+
+      if (error) {
+        console.error('Supabase error:', error);
+        toast({
+          title: "Error",
+          description: `Failed to send message: ${error.message}`,
+          variant: "destructive",
+        });
+      } else {
+        toast({
+          title: "Message Sent!",
+          description: "Thank you for contacting us. We'll get back to you soon.",
+        });
+        form.reset();
+      }
+    } catch (err) {
+      console.error('Unexpected error:', err);
       toast({
         title: "Error",
-        description: "Failed to send message. Please try again.",
+        description: "An unexpected error occurred. Please try again later.",
         variant: "destructive",
       });
-    } else {
-      toast({
-        title: "Message Sent!",
-        description: "Thank you for contacting us. We'll get back to you soon.",
-      });
-      form.reset();
     }
   };
 
