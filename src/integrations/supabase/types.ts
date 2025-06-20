@@ -9,7 +9,251 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      [_ in never]: never
+      financial_statements: {
+        Row: {
+          bookkeeper_id: string
+          client_id: string
+          cost: number | null
+          created_at: string | null
+          current_asset: number | null
+          current_liability: number | null
+          expenses: number | null
+          fixed_asset: number | null
+          fixed_liability: number | null
+          gross_profit: number | null
+          gross_profit_percentage: number | null
+          id: string
+          net_profit: number | null
+          net_profit_percentage: number | null
+          owners_equity: number | null
+          revenue: number | null
+          updated_at: string | null
+          year: number
+        }
+        Insert: {
+          bookkeeper_id: string
+          client_id: string
+          cost?: number | null
+          created_at?: string | null
+          current_asset?: number | null
+          current_liability?: number | null
+          expenses?: number | null
+          fixed_asset?: number | null
+          fixed_liability?: number | null
+          gross_profit?: number | null
+          gross_profit_percentage?: number | null
+          id?: string
+          net_profit?: number | null
+          net_profit_percentage?: number | null
+          owners_equity?: number | null
+          revenue?: number | null
+          updated_at?: string | null
+          year: number
+        }
+        Update: {
+          bookkeeper_id?: string
+          client_id?: string
+          cost?: number | null
+          created_at?: string | null
+          current_asset?: number | null
+          current_liability?: number | null
+          expenses?: number | null
+          fixed_asset?: number | null
+          fixed_liability?: number | null
+          gross_profit?: number | null
+          gross_profit_percentage?: number | null
+          id?: string
+          net_profit?: number | null
+          net_profit_percentage?: number | null
+          owners_equity?: number | null
+          revenue?: number | null
+          updated_at?: string | null
+          year?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "financial_statements_bookkeeper_id_fkey"
+            columns: ["bookkeeper_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "financial_statements_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profiles: {
+        Row: {
+          created_at: string | null
+          email: string
+          full_name: string | null
+          id: string
+          role: Database["public"]["Enums"]["user_role"]
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          email: string
+          full_name?: string | null
+          id: string
+          role?: Database["public"]["Enums"]["user_role"]
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          email?: string
+          full_name?: string | null
+          id?: string
+          role?: Database["public"]["Enums"]["user_role"]
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      tax_computations: {
+        Row: {
+          business_income: number | null
+          capital_allowance: number | null
+          created_at: string | null
+          disallowable_expenses: number | null
+          financial_statement_id: string
+          id: string
+          personal_relief: number | null
+          tax_payable: number | null
+          tax_rate: number | null
+          tax_rebate: number | null
+          updated_at: string | null
+        }
+        Insert: {
+          business_income?: number | null
+          capital_allowance?: number | null
+          created_at?: string | null
+          disallowable_expenses?: number | null
+          financial_statement_id: string
+          id?: string
+          personal_relief?: number | null
+          tax_payable?: number | null
+          tax_rate?: number | null
+          tax_rebate?: number | null
+          updated_at?: string | null
+        }
+        Update: {
+          business_income?: number | null
+          capital_allowance?: number | null
+          created_at?: string | null
+          disallowable_expenses?: number | null
+          financial_statement_id?: string
+          id?: string
+          personal_relief?: number | null
+          tax_payable?: number | null
+          tax_rate?: number | null
+          tax_rebate?: number | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tax_computations_financial_statement_id_fkey"
+            columns: ["financial_statement_id"]
+            isOneToOne: false
+            referencedRelation: "financial_statements"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      tax_planning: {
+        Row: {
+          bookkeeper_id: string
+          client_id: string
+          created_at: string | null
+          id: string
+          planning_details: Json | null
+          updated_at: string | null
+          year: number
+        }
+        Insert: {
+          bookkeeper_id: string
+          client_id: string
+          created_at?: string | null
+          id?: string
+          planning_details?: Json | null
+          updated_at?: string | null
+          year: number
+        }
+        Update: {
+          bookkeeper_id?: string
+          client_id?: string
+          created_at?: string | null
+          id?: string
+          planning_details?: Json | null
+          updated_at?: string | null
+          year?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tax_planning_bookkeeper_id_fkey"
+            columns: ["bookkeeper_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tax_planning_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      tax_simulations: {
+        Row: {
+          bookkeeper_id: string
+          client_id: string
+          created_at: string | null
+          id: string
+          simulation_details: Json | null
+          updated_at: string | null
+          year: number
+        }
+        Insert: {
+          bookkeeper_id: string
+          client_id: string
+          created_at?: string | null
+          id?: string
+          simulation_details?: Json | null
+          updated_at?: string | null
+          year: number
+        }
+        Update: {
+          bookkeeper_id?: string
+          client_id?: string
+          created_at?: string | null
+          id?: string
+          simulation_details?: Json | null
+          updated_at?: string | null
+          year?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tax_simulations_bookkeeper_id_fkey"
+            columns: ["bookkeeper_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tax_simulations_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
@@ -18,7 +262,7 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      [_ in never]: never
+      user_role: "bookkeeper" | "client"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -133,6 +377,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      user_role: ["bookkeeper", "client"],
+    },
   },
 } as const
