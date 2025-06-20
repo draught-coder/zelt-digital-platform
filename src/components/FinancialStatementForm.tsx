@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
@@ -8,8 +7,9 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
+import { ArrowLeft } from 'lucide-react';
 
-const FinancialStatementForm = () => {
+const FinancialStatementForm = ({ statementId, onSave, onBack }) => {
   const { user } = useAuth();
   const { toast } = useToast();
   const [clients, setClients] = useState([]);
@@ -27,9 +27,14 @@ const FinancialStatementForm = () => {
     owners_equity: 0
   });
 
+  const isEditing = Boolean(statementId);
+
   useEffect(() => {
     fetchClients();
-  }, []);
+    if (isEditing) {
+      fetchStatementData(statementId);
+    }
+  }, [statementId]);
 
   const fetchClients = async () => {
     try {
@@ -48,17 +53,45 @@ const FinancialStatementForm = () => {
     }
   };
 
+  const fetchStatementData = async (id) => {
+    setLoading(true);
+    try {
+      const { data, error } = await supabase
+        .from('financial_statements')
+        .select('*')
+        .eq('id', id)
+        .single();
+      
+      if (error) {
+        toast({ title: "Error", description: "Failed to fetch statement data", variant: "destructive" });
+      } else if (data) {
+        setFormData(data);
+      }
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
 
+    const upsertData = {
+      ...formData,
+      bookkeeper_id: user?.id,
+    };
+    
+    // If editing, ensure we pass the ID for the upsert
+    if (isEditing) {
+      upsertData.id = statementId;
+    }
+
     try {
       const { error } = await supabase
         .from('financial_statements')
-        .upsert({
-          ...formData,
-          bookkeeper_id: user?.id,
-        });
+        .upsert(upsertData, { onConflict: 'id' });
 
       if (error) {
         toast({
@@ -69,21 +102,9 @@ const FinancialStatementForm = () => {
       } else {
         toast({
           title: "Success",
-          description: "Financial statement saved successfully"
+          description: `Financial statement ${isEditing ? 'updated' : 'saved'} successfully`
         });
-        // Reset form
-        setFormData({
-          client_id: '',
-          year: new Date().getFullYear(),
-          revenue: 0,
-          cost: 0,
-          expenses: 0,
-          fixed_asset: 0,
-          current_asset: 0,
-          fixed_liability: 0,
-          current_liability: 0,
-          owners_equity: 0
-        });
+        if (onSave) onSave(); // Notify parent to refresh or switch view
       }
     } catch (error) {
       console.error('Error saving financial statement:', error);
@@ -105,163 +126,178 @@ const FinancialStatementForm = () => {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Financial Statement Entry</CardTitle>
-        <CardDescription>Enter financial data for your clients</CardDescription>
+        <div className="flex items-center justify-between">
+          <div>
+            <CardTitle>{isEditing ? 'Edit' : 'New'} Financial Statement</CardTitle>
+            <CardDescription>{isEditing ? 'Update' : 'Enter'} financial data for your clients</CardDescription>
+          </div>
+          {onBack && (
+            <Button variant="outline" size="sm" onClick={onBack}>
+              <ArrowLeft className="h-4 w-4 mr-2" />
+              Back to List
+            </Button>
+          )}
+        </div>
       </CardHeader>
       <CardContent>
-        <form onSubmit={handleSubmit} className="space-y-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="client">Client</Label>
-              <Select value={formData.client_id} onValueChange={(value) => setFormData({...formData, client_id: value})}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select client" />
-                </SelectTrigger>
-                <SelectContent>
-                  {clients.map((client: any) => (
-                    <SelectItem key={client.id} value={client.id}>
-                      {client.full_name || client.email}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+        {loading && !isEditing ? (
+          <div>Loading form...</div>
+        ) : (
+          <form onSubmit={handleSubmit} className="space-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="client">Client</Label>
+                <Select value={formData.client_id} onValueChange={(value) => setFormData({...formData, client_id: value})} disabled={isEditing}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select client" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {clients.map((client: any) => (
+                      <SelectItem key={client.id} value={client.id}>
+                        {client.full_name || client.email}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="year">Year</Label>
+                <Input
+                  id="year"
+                  type="number"
+                  value={formData.year}
+                  onChange={(e) => setFormData({...formData, year: parseInt(e.target.value)})}
+                  required
+                  disabled={isEditing}
+                />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="revenue">Revenue (RM)</Label>
+                <Input
+                  id="revenue"
+                  type="number"
+                  step="0.01"
+                  value={formData.revenue}
+                  onChange={(e) => setFormData({...formData, revenue: parseFloat(e.target.value) || 0})}
+                  required
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="cost">Cost of Goods Sold (RM)</Label>
+                <Input
+                  id="cost"
+                  type="number"
+                  step="0.01"
+                  value={formData.cost}
+                  onChange={(e) => setFormData({...formData, cost: parseFloat(e.target.value) || 0})}
+                  required
+                />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 bg-gray-50 rounded-lg">
+              <div>
+                <Label className="text-sm font-medium">Gross Profit</Label>
+                <p className="text-lg font-bold text-green-600">RM {grossProfit.toLocaleString()}</p>
+              </div>
+              <div>
+                <Label className="text-sm font-medium">Gross Profit %</Label>
+                <p className="text-lg font-bold text-green-600">{grossProfitPercentage}%</p>
+              </div>
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="year">Year</Label>
+              <Label htmlFor="expenses">Operating Expenses (RM)</Label>
               <Input
-                id="year"
+                id="expenses"
                 type="number"
-                value={formData.year}
-                onChange={(e) => setFormData({...formData, year: parseInt(e.target.value)})}
+                step="0.01"
+                value={formData.expenses}
+                onChange={(e) => setFormData({...formData, expenses: parseFloat(e.target.value) || 0})}
                 required
               />
             </div>
-          </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="revenue">Revenue (RM)</Label>
-              <Input
-                id="revenue"
-                type="number"
-                step="0.01"
-                value={formData.revenue}
-                onChange={(e) => setFormData({...formData, revenue: parseFloat(e.target.value) || 0})}
-                required
-              />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 bg-blue-50 rounded-lg">
+              <div>
+                <Label className="text-sm font-medium">Net Profit</Label>
+                <p className="text-lg font-bold text-blue-600">RM {netProfit.toLocaleString()}</p>
+              </div>
+              <div>
+                <Label className="text-sm font-medium">Net Profit %</Label>
+                <p className="text-lg font-bold text-blue-600">{netProfitPercentage}%</p>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="fixed_asset">Fixed Assets (RM)</Label>
+                <Input
+                  id="fixed_asset"
+                  type="number"
+                  step="0.01"
+                  value={formData.fixed_asset}
+                  onChange={(e) => setFormData({...formData, fixed_asset: parseFloat(e.target.value) || 0})}
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="current_asset">Current Assets (RM)</Label>
+                <Input
+                  id="current_asset"
+                  type="number"
+                  step="0.01"
+                  value={formData.current_asset}
+                  onChange={(e) => setFormData({...formData, current_asset: parseFloat(e.target.value) || 0})}
+                />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="fixed_liability">Fixed Liabilities (RM)</Label>
+                <Input
+                  id="fixed_liability"
+                  type="number"
+                  step="0.01"
+                  value={formData.fixed_liability}
+                  onChange={(e) => setFormData({...formData, fixed_liability: parseFloat(e.target.value) || 0})}
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="current_liability">Current Liabilities (RM)</Label>
+                <Input
+                  id="current_liability"
+                  type="number"
+                  step="0.01"
+                  value={formData.current_liability}
+                  onChange={(e) => setFormData({...formData, current_liability: parseFloat(e.target.value) || 0})}
+                />
+              </div>
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="cost">Cost of Goods Sold (RM)</Label>
+              <Label htmlFor="owners_equity">Owner's Equity (RM)</Label>
               <Input
-                id="cost"
+                id="owners_equity"
                 type="number"
                 step="0.01"
-                value={formData.cost}
-                onChange={(e) => setFormData({...formData, cost: parseFloat(e.target.value) || 0})}
-                required
-              />
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 bg-gray-50 rounded-lg">
-            <div>
-              <Label className="text-sm font-medium">Gross Profit</Label>
-              <p className="text-lg font-bold text-green-600">RM {grossProfit.toLocaleString()}</p>
-            </div>
-            <div>
-              <Label className="text-sm font-medium">Gross Profit %</Label>
-              <p className="text-lg font-bold text-green-600">{grossProfitPercentage}%</p>
-            </div>
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="expenses">Operating Expenses (RM)</Label>
-            <Input
-              id="expenses"
-              type="number"
-              step="0.01"
-              value={formData.expenses}
-              onChange={(e) => setFormData({...formData, expenses: parseFloat(e.target.value) || 0})}
-              required
-            />
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 bg-blue-50 rounded-lg">
-            <div>
-              <Label className="text-sm font-medium">Net Profit</Label>
-              <p className="text-lg font-bold text-blue-600">RM {netProfit.toLocaleString()}</p>
-            </div>
-            <div>
-              <Label className="text-sm font-medium">Net Profit %</Label>
-              <p className="text-lg font-bold text-blue-600">{netProfitPercentage}%</p>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="fixed_asset">Fixed Assets (RM)</Label>
-              <Input
-                id="fixed_asset"
-                type="number"
-                step="0.01"
-                value={formData.fixed_asset}
-                onChange={(e) => setFormData({...formData, fixed_asset: parseFloat(e.target.value) || 0})}
+                value={formData.owners_equity}
+                onChange={(e) => setFormData({...formData, owners_equity: parseFloat(e.target.value) || 0})}
               />
             </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="current_asset">Current Assets (RM)</Label>
-              <Input
-                id="current_asset"
-                type="number"
-                step="0.01"
-                value={formData.current_asset}
-                onChange={(e) => setFormData({...formData, current_asset: parseFloat(e.target.value) || 0})}
-              />
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="fixed_liability">Fixed Liabilities (RM)</Label>
-              <Input
-                id="fixed_liability"
-                type="number"
-                step="0.01"
-                value={formData.fixed_liability}
-                onChange={(e) => setFormData({...formData, fixed_liability: parseFloat(e.target.value) || 0})}
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="current_liability">Current Liabilities (RM)</Label>
-              <Input
-                id="current_liability"
-                type="number"
-                step="0.01"
-                value={formData.current_liability}
-                onChange={(e) => setFormData({...formData, current_liability: parseFloat(e.target.value) || 0})}
-              />
-            </div>
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="owners_equity">Owner's Equity (RM)</Label>
-            <Input
-              id="owners_equity"
-              type="number"
-              step="0.01"
-              value={formData.owners_equity}
-              onChange={(e) => setFormData({...formData, owners_equity: parseFloat(e.target.value) || 0})}
-            />
-          </div>
-
-          <Button type="submit" className="w-full" disabled={loading || !formData.client_id}>
-            {loading ? 'Saving...' : 'Save Financial Statement'}
-          </Button>
-        </form>
+            <Button type="submit" className="w-full" disabled={loading}>
+              {loading ? 'Saving...' : (isEditing ? 'Update Statement' : 'Save Statement')}
+            </Button>
+          </form>
+        )}
       </CardContent>
     </Card>
   );
