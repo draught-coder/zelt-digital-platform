@@ -63,7 +63,7 @@ const Info = () => {
               {fetchError}
             </div>
           )}
-          <Tabs defaultValue="individual" className="max-w-6xl mx-auto">
+          <Tabs defaultValue="individual" className="max-w-4xl mx-auto">
             <TabsList className="grid w-full grid-cols-3 mb-8">
               <TabsTrigger value="individual">
                 Individual Tax

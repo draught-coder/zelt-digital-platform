@@ -52,22 +52,26 @@ const AuthPage = () => {
       console.error("Login error:", error);
       setErrorMsg(`Login failed: ${error.message}`);
     } else {
-      console.log("Login successful, user data:", data.user);
+      console.log("✅ Login successful for user:", data.user);
       
+      const userId = data.user?.id;
+      console.log(`🔍 Searching for profile with ID: ${userId}`);
+
       // Verify user exists in profiles table
       const { data: profileData, error: profileError } = await supabase
         .from('profiles')
         .select('role')
-        .eq('id', data.user?.id)
+        .eq('id', userId)
         .single();
       
       if (profileError) {
-        console.error("Profile fetch error:", profileError);
-        setErrorMsg("User profile not found. Please contact support.");
+        console.error("❌ Profile fetch error:", profileError);
+        setErrorMsg(`User profile not found. Please contact support. Error: ${profileError.message}`);
       } else {
-        console.log("User role:", profileData?.role);
+        console.log("✅ Profile found. User role:", profileData?.role);
         
         if (profileData?.role !== 'bookkeeper') {
+          console.warn(`Role mismatch: Expected 'bookkeeper', but got '${profileData?.role}'`);
           setErrorMsg("Access denied. This account is not authorized for bookkeeper access.");
         } else {
           // Save email to localStorage if "Remember Me" is checked
@@ -102,22 +106,26 @@ const AuthPage = () => {
       console.error("Login error:", error);
       setErrorMsg(`Login failed: ${error.message}`);
     } else {
-      console.log("Login successful, user data:", data.user);
+      console.log("✅ Login successful for user:", data.user);
+      
+      const userId = data.user?.id;
+      console.log(`🔍 Searching for client profile with ID: ${userId}`);
       
       // Verify user exists in profiles table
       const { data: profileData, error: profileError } = await supabase
         .from('profiles')
         .select('role')
-        .eq('id', data.user?.id)
+        .eq('id', userId)
         .single();
       
       if (profileError) {
-        console.error("Profile fetch error:", profileError);
-        setErrorMsg("User profile not found. Please contact support.");
+        console.error("❌ Profile fetch error:", profileError);
+        setErrorMsg(`User profile not found. Please contact support. Error: ${profileError.message}`);
       } else {
-        console.log("User role:", profileData?.role);
+        console.log("✅ Profile found. User role:", profileData?.role);
         
         if (profileData?.role !== 'client') {
+          console.warn(`Role mismatch: Expected 'client', but got '${profileData?.role}'`);
           setErrorMsg("Access denied. This account is not authorized for client access.");
         } else {
           // Save email to localStorage if "Remember Me" is checked

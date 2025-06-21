@@ -3,7 +3,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { LogOut, Plus, Calculator, Users } from 'lucide-react';
+import { LogOut, Plus, Calculator, UserPlus } from 'lucide-react';
 import ClientList from './ClientList';
 import FinancialStatementList from './FinancialStatementList';
 import FinancialStatementForm from './FinancialStatementForm';
@@ -11,6 +11,18 @@ import TaxComputationList from './TaxComputationList';
 import TaxComputationForm from './TaxComputationForm';
 import OverviewStats from './OverviewStats';
 import TaxSubmissionManager from './TaxSubmissionManager';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import AddUserForm from './AddUserForm';
+import BlogAdminSection from '@/pages/blog/BlogAdminSection';
+import FinancialStatementManager from './FinancialStatementManager';
+import TaxComputationManager from './TaxComputationManager';
 
 const BookkeeperDashboard = () => {
   const { user, signOut } = useAuth();
@@ -19,6 +31,7 @@ const BookkeeperDashboard = () => {
   const [editingComputationId, setEditingComputationId] = useState(null);
   const [financialView, setFinancialView] = useState('list'); // 'list', 'new', 'edit'
   const [taxView, setTaxView] = useState('list'); // 'list', 'new', 'edit'
+  const [isAddUserDialogOpen, setIsAddUserDialogOpen] = useState(false);
 
   const handleEditStatement = (id) => {
     setEditingStatementId(id);
@@ -27,8 +40,6 @@ const BookkeeperDashboard = () => {
   };
 
   const handleNewStatement = () => {
-    setEditingStatementId(null);
-    setFinancialView('new');
     setActiveTab('financial');
   };
 
@@ -49,8 +60,6 @@ const BookkeeperDashboard = () => {
   };
 
   const handleNewComputation = () => {
-    setEditingComputationId(null);
-    setTaxView('new');
     setActiveTab('tax');
   };
 
@@ -91,13 +100,14 @@ const BookkeeperDashboard = () => {
             setEditingComputationId(null);
           }
         }} className="space-y-6">
-          <TabsList className="grid w-full grid-cols-6">
+          <TabsList className="grid w-full grid-cols-7">
             <TabsTrigger value="overview">Overview</TabsTrigger>
             <TabsTrigger value="clients">Clients</TabsTrigger>
             <TabsTrigger value="financial">Financial Statements</TabsTrigger>
             <TabsTrigger value="tax">Tax Computation</TabsTrigger>
             <TabsTrigger value="submissions">Tax Submissions</TabsTrigger>
             <TabsTrigger value="planning">Planning</TabsTrigger>
+            <TabsTrigger value="blog">Blog</TabsTrigger>
           </TabsList>
 
           <TabsContent value="overview">
@@ -117,10 +127,23 @@ const BookkeeperDashboard = () => {
                   <Calculator className="h-4 w-4" />
                   New Tax Computation
                 </Button>
-                <Button onClick={() => setActiveTab('clients')} variant="outline" className="flex items-center gap-2">
-                  <Users className="h-4 w-4" />
-                  Manage Clients
-                </Button>
+                <Dialog open={isAddUserDialogOpen} onOpenChange={setIsAddUserDialogOpen}>
+                  <DialogTrigger asChild>
+                    <Button variant="outline" className="flex items-center gap-2">
+                      <UserPlus className="h-4 w-4" />
+                      Add New User
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent className="sm:max-w-[425px]">
+                    <DialogHeader>
+                        <DialogTitle>Add New User</DialogTitle>
+                        <DialogDescription>
+                            Create a new client or bookkeeper account.
+                        </DialogDescription>
+                    </DialogHeader>
+                    <AddUserForm onUserAdded={() => setIsAddUserDialogOpen(false)} />
+                  </DialogContent>
+                </Dialog>
               </CardContent>
             </Card>
           </TabsContent>
@@ -130,45 +153,11 @@ const BookkeeperDashboard = () => {
           </TabsContent>
 
           <TabsContent value="financial">
-            {financialView === 'list' && (
-              <>
-                <div className="flex justify-end mb-4">
-                  <Button onClick={handleNewStatement}>
-                    <Plus className="h-4 w-4 mr-2" />
-                    New Statement
-                  </Button>
-                </div>
-                <FinancialStatementList onEdit={handleEditStatement} />
-              </>
-            )}
-            {(financialView === 'new' || financialView === 'edit') && (
-              <FinancialStatementForm 
-                statementId={editingStatementId} 
-                onSave={handleSaveStatement}
-                onBack={handleBackStatement}
-              />
-            )}
+            <FinancialStatementManager />
           </TabsContent>
 
           <TabsContent value="tax">
-            {taxView === 'list' && (
-              <>
-                <div className="flex justify-end mb-4">
-                  <Button onClick={handleNewComputation}>
-                    <Plus className="h-4 w-4 mr-2" />
-                    New Computation
-                  </Button>
-                </div>
-                <TaxComputationList onEdit={handleEditComputation} />
-              </>
-            )}
-            {(taxView === 'new' || taxView === 'edit') && (
-              <TaxComputationForm 
-                computationId={editingComputationId} 
-                onSave={handleSaveComputation}
-                onBack={handleBackComputation}
-              />
-            )}
+            <TaxComputationManager />
           </TabsContent>
 
           <TabsContent value="submissions">
@@ -185,6 +174,10 @@ const BookkeeperDashboard = () => {
                 <p className="text-muted-foreground">This feature will include tax planning strategies and simulation tools.</p>
               </CardContent>
             </Card>
+          </TabsContent>
+
+          <TabsContent value="blog">
+            <BlogAdminSection isAdmin={true} />
           </TabsContent>
         </Tabs>
       </main>
