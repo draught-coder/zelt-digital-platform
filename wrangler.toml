@@ -1,6 +1,16 @@
-name = "zelt-digital-platform"
+name = "ibnzelt-official"
 compatibility_date = "2025-06-21"
 main = "workers-site/index.js"
 
 [site]
-bucket = "./dist" 
+bucket = "./dist"
+
+[env.production]
+name = "ibnzelt-official"
+routes = [
+  "ibnzelt.com/*",
+  "www.ibnzelt.com/*"
+]
+
+[env.development]
+name = "ibnzelt-official-dev" 
