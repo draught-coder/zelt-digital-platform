@@ -1,5 +1,0 @@
-name = "zelt-digital-platform"
-compatibility_date = "2025-06-21"
-
-[assets]
-directory = "./dist" 
