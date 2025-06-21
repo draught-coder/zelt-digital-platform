@@ -1,0 +1,5 @@
+name = "zelt-digital-platform"
+compatibility_date = "2025-06-21"
+
+[site]
+bucket = "./dist" 
