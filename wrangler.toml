@@ -1,5 +1,6 @@
 name = "zelt-digital-platform"
 compatibility_date = "2025-06-21"
+main = "workers-site/index.js"
 
 [site]
 bucket = "./dist" 
