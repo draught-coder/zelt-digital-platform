@@ -6,19 +6,30 @@ import CorporateTaxRates from "@/components/info/CorporateTaxRates";
 import TaxReliefCards from "@/components/info/TaxReliefCards";
 import InfoContactCTA from "@/components/info/InfoContactCTA";
 import { supabase } from "../../dashboard-app/src/integrations/supabase/client";
+import { useAuth } from "@/hooks/useAuth";
 
 const Info = () => {
   const [years, setYears] = useState<string[]>([]);
   const [selectedYear, setSelectedYear] = useState<string>("");
   const [fetchError, setFetchError] = useState<string | null>(null);
+  const { user, userRole } = useAuth();
+
+  // Debug logging
+  console.log('Info page render:', { user: user?.email, userRole });
 
   // Fetch available years dynamically from Supabase
   useEffect(() => {
     const fetchYears = async () => {
+      console.log('Fetching years from individual_tax_rates...');
+      console.log('Current user:', user?.email);
+      console.log('Current user role:', userRole);
+      
       const { data, error } = await supabase
         .from('individual_tax_rates')
         .select('year')
         .order('year', { ascending: false });
+
+      console.log('Years query result:', { data, error });
 
       if (error) {
         setFetchError("Failed to fetch years from Supabase. Please ensure the tax tables exist.");
@@ -33,6 +44,7 @@ const Info = () => {
         const uniqueYears = Array.from(
           new Set(data.map((row) => String(row.year)))
         );
+        console.log("Mapped unique years:", uniqueYears);
         setYears(uniqueYears);
         
         // Set the most recent year as the default
@@ -50,7 +62,7 @@ const Info = () => {
       }
     };
     fetchYears();
-  }, []);
+  }, [user, userRole]);
 
   return (
     <div className="min-h-screen bg-white">

@@ -5,6 +5,7 @@ import { toast } from "@/components/ui/use-toast";
 import BlogAdminPanel from "./BlogAdminPanel";
 import BlogPostList from "./BlogPostList";
 import BlogPostEditor from "./BlogPostEditor";
+import { useAuth } from "@/hooks/useAuth";
 
 interface BlogAdminSectionProps {
   isAdmin: boolean;
@@ -16,17 +17,28 @@ const BlogAdminSection: React.FC<BlogAdminSectionProps> = ({ isAdmin }) => {
   const [showEditor, setShowEditor] = useState(false);
   const [editPost, setEditPost] = useState<any>(null);
   const [form, setForm] = useState(defaultForm);
+  const { user, userRole } = useAuth();
 
   const queryClient = useQueryClient();
 
+  // Debug logging
+  console.log('BlogAdminSection render:', { isAdmin, user: user?.email, userRole });
+
   // fetch blog posts
-  const { data: blogPosts } = useQuery({
+  const { data: blogPosts, isLoading, error } = useQuery({
     queryKey: ['blog_posts'],
     queryFn: async () => {
+      console.log('Fetching blog posts...');
+      console.log('Current user:', user?.email);
+      console.log('Current user role:', userRole);
+      
       const { data, error } = await supabase
         .from('blog_posts')
         .select('*')
         .order('date', { ascending: false });
+      
+      console.log('Blog posts query result:', { data, error });
+      
       if (error) {
         console.error('Error fetching blog posts:', error);
         throw error;
@@ -34,6 +46,10 @@ const BlogAdminSection: React.FC<BlogAdminSectionProps> = ({ isAdmin }) => {
       return data;
     },
   });
+
+  console.log('Blog posts data:', blogPosts);
+  console.log('Blog posts loading:', isLoading);
+  console.log('Blog posts error:', error);
 
   // Blog post mutations
   const createMutation = useMutation({
