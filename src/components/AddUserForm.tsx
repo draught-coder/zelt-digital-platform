@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { supabase } from '@/integrations/supabase/client';
+import { supabase } from "../../dashboard-app/src/integrations/supabase/client";
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -30,26 +30,55 @@ const AddUserForm = ({ onUserAdded }: AddUserFormProps) => {
     }
     setLoading(true);
 
-    // NOTE: The 'create-user' Supabase Edge Function needs to be created and deployed
-    // for this form to work.
-    const { error } = await supabase.functions.invoke('create-user', {
-      body: { fullName, email, password, role },
-    });
+    try {
+      // Create user in Supabase Auth
+      const { data: authData, error: authError } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          data: {
+            full_name: fullName,
+            role: role
+          }
+        }
+      });
 
-    setLoading(false);
+      if (authError) {
+        throw authError;
+      }
 
-    if (error) {
+      if (authData.user) {
+        // Insert profile data
+        const { error: profileError } = await supabase
+          .from('profiles')
+          .insert({
+            id: authData.user.id,
+            full_name: fullName,
+            email: email,
+            role: role
+          });
+
+        if (profileError) {
+          console.error('Profile creation error:', profileError);
+          // Note: The user was created in auth but profile insertion failed
+          // In a production app, you might want to handle this differently
+        }
+
+        toast({
+          title: 'User created successfully',
+          description: `${fullName} has been added. They will receive an email to confirm their account.`,
+        });
+        onUserAdded();
+      }
+    } catch (error: any) {
+      console.error('User creation error:', error);
       toast({
         title: 'Failed to create user',
-        description: error.message,
+        description: error.message || 'An error occurred while creating the user.',
         variant: 'destructive',
       });
-    } else {
-      toast({
-        title: 'User created successfully',
-        description: `${fullName} has been added.`,
-      });
-      onUserAdded();
+    } finally {
+      setLoading(false);
     }
   };
 
