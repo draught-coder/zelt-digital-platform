@@ -1,7 +1,7 @@
 import React from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
+import { supabase } from "../../dashboard-app/src/integrations/supabase/client";
 import { Calendar, Clock, ArrowLeft, User } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
@@ -18,7 +18,10 @@ const BlogPostDetail = () => {
         .eq('id', parseInt(id || '0'))
         .single();
       
-      if (error) throw error;
+      if (error) {
+        console.error('Error fetching blog post:', error);
+        throw error;
+      }
       return data;
     },
     enabled: !!id && !isNaN(parseInt(id)),
