@@ -2,38 +2,29 @@
 const DOCUSEAL_BASE_URL = 'https://sign.app.ibnzelt.com';
 const DOCUSEAL_API_KEY = 'eCfHk2FfiW3SsCjbELmjcVrzgy3VwUuenhaM9aNvwis';
 
-export interface DocuSealForm {
-  id: string;
+export interface DocuSealTemplate {
+  id: number;
   name: string;
   description?: string;
-  status: 'draft' | 'active' | 'archived';
   created_at: string;
   updated_at: string;
-  submissions_count: number;
-  fields_count: number;
 }
 
 export interface DocuSealSubmission {
   id: string;
-  form_id: string;
-  email: string;
-  status: 'pending' | 'completed' | 'expired';
-  created_at: string;
+  template_id: number;
+  email?: string;
+  status?: string;
+  created_at?: string;
   completed_at?: string;
-  expires_at?: string;
   document_url?: string;
 }
 
-export interface CreateFormData {
-  name: string;
-  description?: string;
-  fields?: any[];
-}
-
-export interface SendSubmissionData {
-  email: string;
-  message?: string;
-  expires_in_days?: number;
+export interface CreateSubmissionData {
+  template_id: number;
+  submitters?: any[];
+  emails?: string;
+  values?: Record<string, any>;
 }
 
 class DocuSealAPI {
@@ -47,74 +38,57 @@ class DocuSealAPI {
 
   private async request(endpoint: string, options: RequestInit = {}) {
     const url = `${this.baseURL}/api${endpoint}`;
-    
+    let extraHeaders: Record<string, string> = {};
+    if (options.headers && typeof options.headers === 'object' && !Array.isArray(options.headers)) {
+      extraHeaders = options.headers as Record<string, string>;
+    }
+    const headers: Record<string, string> = {
+      'X-Auth-Token': this.apiKey,
+      ...extraHeaders,
+    };
+    // Only set Content-Type if not sending FormData
+    if (!(options.body instanceof FormData) && options.method !== 'GET') {
+      headers['Content-Type'] = 'application/json';
+    }
     const response = await fetch(url, {
       ...options,
-      headers: {
-        'Authorization': `Bearer ${this.apiKey}`,
-        'Content-Type': 'application/json',
-        ...options.headers,
-      },
+      headers,
     });
-
     if (!response.ok) {
       throw new Error(`DocuSeal API error: ${response.status} ${response.statusText}`);
     }
-
     return response.json();
   }
 
-  // Get all forms
-  async getForms(): Promise<DocuSealForm[]> {
-    return this.request('/forms');
+  // Get all templates (forms)
+  async getTemplates(): Promise<DocuSealTemplate[]> {
+    return this.request('/templates');
   }
 
-  // Get a specific form
-  async getForm(formId: string): Promise<DocuSealForm> {
-    return this.request(`/forms/${formId}`);
+  // Get a specific template
+  async getTemplate(templateId: number): Promise<DocuSealTemplate> {
+    return this.request(`/templates/${templateId}`);
   }
 
-  // Create a new form
-  async createForm(data: CreateFormData): Promise<DocuSealForm> {
-    return this.request('/forms', {
+  // Create a submission (send for signing)
+  async createSubmission(data: CreateSubmissionData): Promise<DocuSealSubmission> {
+    return this.request('/submissions', {
       method: 'POST',
       body: JSON.stringify(data),
     });
   }
 
-  // Upload a document to a form
-  async uploadDocument(formId: string, file: File): Promise<any> {
-    const formData = new FormData();
-    formData.append('file', file);
-
-    const url = `${this.baseURL}/api/forms/${formId}/documents`;
-    
-    const response = await fetch(url, {
+  // Send to multiple emails (alternative endpoint)
+  async sendSubmissionEmails(templateId: number, emails: string): Promise<any> {
+    return this.request('/submissions/emails', {
       method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${this.apiKey}`,
-      },
-      body: formData,
+      body: JSON.stringify({ template_id: templateId, emails }),
     });
-
-    if (!response.ok) {
-      throw new Error(`DocuSeal API error: ${response.status} ${response.statusText}`);
-    }
-
-    return response.json();
   }
 
-  // Get submissions for a form
-  async getSubmissions(formId: string): Promise<DocuSealSubmission[]> {
-    return this.request(`/forms/${formId}/submissions`);
-  }
-
-  // Send a submission for signing
-  async sendSubmission(formId: string, data: SendSubmissionData): Promise<DocuSealSubmission> {
-    return this.request(`/forms/${formId}/submissions`, {
-      method: 'POST',
-      body: JSON.stringify(data),
-    });
+  // Get template details
+  async getTemplateDetails(templateId: number): Promise<any> {
+    return this.request(`/templates/${templateId}`);
   }
 
   // Get a specific submission
@@ -122,27 +96,33 @@ class DocuSealAPI {
     return this.request(`/submissions/${submissionId}`);
   }
 
-  // Delete a form
-  async deleteForm(formId: string): Promise<void> {
-    return this.request(`/forms/${formId}`, {
-      method: 'DELETE',
-    });
-  }
-
   // Get signing URL for a submission
   getSigningUrl(submissionId: string): string {
     return `${this.baseURL}/s/${submissionId}`;
   }
 
-  // Generate a direct signing link (no login required)
-  generateDirectSigningLink(submissionId: string, clientEmail: string): string {
-    const baseUrl = window.location.origin;
-    return `${baseUrl}/sign/${submissionId}?email=${encodeURIComponent(clientEmail)}`;
+  // Create a new template (not supported in DocuSeal 2.x API)
+  async createTemplate({ name, description }: { name: string; description?: string }): Promise<DocuSealTemplate> {
+    throw new Error('DocuSeal 2.x does not support creating templates via API. Please upload documents via the DocuSeal web UI.');
   }
 
-  // Get form builder URL
-  getFormBuilderUrl(formId: string): string {
-    return `${this.baseURL}/forms/${formId}/edit`;
+  // Upload a document to a template (not supported in DocuSeal 2.x API)
+  async uploadDocument(templateId: number, file: File): Promise<any> {
+    throw new Error('DocuSeal 2.x does not support uploading documents via API. Please upload via the DocuSeal web UI.');
+  }
+
+  // Send a template for signing (create a submission)
+  async sendSubmission(templateId: number, data: { email: string; message?: string; expires_in_days?: number }): Promise<DocuSealSubmission> {
+    return this.createSubmission({
+      template_id: templateId,
+      emails: data.email,
+      values: {},
+    });
+  }
+
+  // Get the template builder URL (for editing a template in the UI)
+  getTemplateBuilderUrl(templateId: number): string {
+    return `${this.baseURL}/templates/${templateId}/edit`;
   }
 }
 

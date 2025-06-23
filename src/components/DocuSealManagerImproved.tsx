@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
-import { docuSealAPI, DocuSealForm, DocuSealSubmission } from '@/lib/docuseal-api';
+import { docuSealAPI, DocuSealTemplate, DocuSealSubmission } from '@/lib/docuseal-api';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -15,7 +15,7 @@ import { useToast } from '@/hooks/use-toast';
 import { Plus, Send, Edit, Upload, Download, Eye, ExternalLink, Home, Users, FileText, Calendar, CheckCircle } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
-interface FormWithSubmissions extends DocuSealForm {
+interface TemplateWithSubmissions extends DocuSealTemplate {
   submissions?: DocuSealSubmission[];
   assigned_client?: {
     id: string;
@@ -27,16 +27,16 @@ interface FormWithSubmissions extends DocuSealForm {
 const DocuSealManagerImproved = () => {
   const { user } = useAuth();
   const { toast } = useToast();
-  const [forms, setForms] = useState<FormWithSubmissions[]>([]);
+  const [templates, setTemplates] = useState<TemplateWithSubmissions[]>([]);
   const [clients, setClients] = useState([]);
   const [loading, setLoading] = useState(false);
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [isSendOpen, setIsSendOpen] = useState(false);
   const [isSubmissionsOpen, setIsSubmissionsOpen] = useState(false);
-  const [selectedForm, setSelectedForm] = useState<FormWithSubmissions | null>(null);
+  const [selectedTemplate, setSelectedTemplate] = useState<TemplateWithSubmissions | null>(null);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   
-  const [formData, setFormData] = useState({
+  const [templateData, setTemplateData] = useState({
     name: '',
     description: '',
     client_id: '',
@@ -44,41 +44,27 @@ const DocuSealManagerImproved = () => {
   });
 
   const [submissionData, setSubmissionData] = useState({
-    form_id: '',
+    template_id: '',
     client_email: '',
     message: '',
     expires_in_days: 7
   });
 
   useEffect(() => {
-    fetchForms();
+    fetchTemplates();
     fetchClients();
   }, []);
 
-  const fetchForms = async () => {
+  const fetchTemplates = async () => {
     setLoading(true);
     try {
-      const formsData = await docuSealAPI.getForms();
-      
-      // Fetch submissions for each form
-      const formsWithSubmissions = await Promise.all(
-        formsData.map(async (form) => {
-          try {
-            const submissions = await docuSealAPI.getSubmissions(form.id);
-            return { ...form, submissions };
-          } catch (error) {
-            console.error(`Error fetching submissions for form ${form.id}:`, error);
-            return { ...form, submissions: [] };
-          }
-        })
-      );
-      
-      setForms(formsWithSubmissions);
+      const templatesData = await docuSealAPI.getTemplates();
+      setTemplates(templatesData);
     } catch (error) {
-      console.error('Error fetching forms:', error);
+      console.error('Error fetching templates:', error);
       toast({
         title: "Error",
-        description: "Failed to fetch forms",
+        description: "Failed to fetch templates",
         variant: "destructive"
       });
     } finally {
@@ -103,54 +89,59 @@ const DocuSealManagerImproved = () => {
     }
   };
 
-  const handleCreateForm = async (e: React.FormEvent) => {
+  const handleCreateTemplate = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    
     try {
-      const newForm = await docuSealAPI.createForm({
-        name: formData.name,
-        description: formData.description
-      });
-
-      if (selectedFile) {
-        await docuSealAPI.uploadDocument(newForm.id, selectedFile);
+      let newTemplate: DocuSealTemplate | null = null;
+      try {
+        newTemplate = await docuSealAPI.createTemplate({
+          name: templateData.name,
+          description: templateData.description
+        });
+      } catch (err: any) {
+        toast({
+          title: 'DocuSeal Limitation',
+          description: err.message,
+          variant: 'destructive',
+        });
+        setLoading(false);
+        return;
       }
-
-      // Store form reference in Supabase with client assignment
-      if (formData.client_id) {
+      // DocuSeal 2.x: uploading documents via API is not supported
+      // if (selectedFile) {
+      //   await docuSealAPI.uploadDocument(newTemplate.id, selectedFile);
+      // }
+      if (templateData.client_id && newTemplate) {
         const { error } = await supabase
-          .from('docuseal_forms')
+          .from('docuseal_templates')
           .insert({
-            docuseal_form_id: newForm.id,
-            name: formData.name,
-            description: formData.description,
-            client_id: formData.client_id,
-            document_type: formData.document_type,
+            docuseal_template_id: newTemplate.id,
+            name: templateData.name,
+            description: templateData.description,
+            client_id: templateData.client_id,
+            document_type: templateData.document_type,
             created_by: user?.id
           });
-
         if (error) {
-          console.error('Error storing form reference:', error);
+          console.error('Error storing template reference:', error);
         }
       }
-
       toast({
         title: "Success",
         description: "Document created successfully",
       });
-      
       setIsCreateOpen(false);
-      setFormData({
+      setTemplateData({
         name: '',
         description: '',
         client_id: '',
         document_type: 'tax_authorization'
       });
       setSelectedFile(null);
-      fetchForms();
+      fetchTemplates();
     } catch (error) {
-      console.error('Error creating form:', error);
+      console.error('Error creating template:', error);
       toast({
         title: "Error",
         description: "Failed to create document",
@@ -164,17 +155,12 @@ const DocuSealManagerImproved = () => {
   const handleSendSubmission = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    
     try {
-      await docuSealAPI.sendSubmission(
-        submissionData.form_id,
-        {
-          email: submissionData.client_email,
-          message: submissionData.message,
-          expires_in_days: submissionData.expires_in_days
-        }
-      );
-
+      await docuSealAPI.sendSubmission(Number(submissionData.template_id), {
+        email: submissionData.client_email,
+        message: submissionData.message,
+        expires_in_days: submissionData.expires_in_days
+      });
       toast({
         title: "Success",
         description: "Document sent for signing",
@@ -182,12 +168,12 @@ const DocuSealManagerImproved = () => {
       
       setIsSendOpen(false);
       setSubmissionData({
-        form_id: '',
+        template_id: '',
         client_email: '',
         message: '',
         expires_in_days: 7
       });
-      fetchForms();
+      fetchTemplates();
     } catch (error) {
       console.error('Error sending submission:', error);
       toast({
@@ -200,8 +186,8 @@ const DocuSealManagerImproved = () => {
     }
   };
 
-  const openFormBuilder = (formId: string) => {
-    const url = docuSealAPI.getFormBuilderUrl(formId);
+  const openTemplateBuilder = (templateId: string | number) => {
+    const url = docuSealAPI.getTemplateBuilderUrl(Number(templateId));
     window.open(url, '_blank');
   };
 
@@ -217,8 +203,8 @@ const DocuSealManagerImproved = () => {
     }
   };
 
-  const viewSubmissions = (form: FormWithSubmissions) => {
-    setSelectedForm(form);
+  const viewSubmissions = (template: TemplateWithSubmissions) => {
+    setSelectedTemplate(template);
     setIsSubmissionsOpen(true);
   };
 
@@ -235,12 +221,12 @@ const DocuSealManagerImproved = () => {
     return <Badge variant={variants[status as keyof typeof variants]}>{status}</Badge>;
   };
 
-  const getCompletedSubmissionsCount = (form: FormWithSubmissions) => {
-    return form.submissions?.filter(sub => sub.status === 'completed').length || 0;
+  const getCompletedSubmissionsCount = (template: TemplateWithSubmissions) => {
+    return template.submissions?.filter(sub => sub.status === 'completed').length || 0;
   };
 
-  const getPendingSubmissionsCount = (form: FormWithSubmissions) => {
-    return form.submissions?.filter(sub => sub.status === 'pending').length || 0;
+  const getPendingSubmissionsCount = (template: TemplateWithSubmissions) => {
+    return template.submissions?.filter(sub => sub.status === 'pending').length || 0;
   };
 
   const getDocumentTypeLabel = (type: string) => {
@@ -289,14 +275,14 @@ const DocuSealManagerImproved = () => {
                 <DialogHeader>
                   <DialogTitle>Create New Document</DialogTitle>
                 </DialogHeader>
-                <form onSubmit={handleCreateForm} className="space-y-6">
+                <form onSubmit={handleCreateTemplate} className="space-y-6">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="space-y-2">
                       <Label htmlFor="name">Document Name</Label>
                       <Input
                         id="name"
-                        value={formData.name}
-                        onChange={(e) => setFormData({...formData, name: e.target.value})}
+                        value={templateData.name}
+                        onChange={(e) => setTemplateData({...templateData, name: e.target.value})}
                         placeholder="e.g., Tax Authorization Form 2024"
                         required
                       />
@@ -304,8 +290,8 @@ const DocuSealManagerImproved = () => {
                     <div className="space-y-2">
                       <Label htmlFor="document_type">Document Type</Label>
                       <Select 
-                        value={formData.document_type} 
-                        onValueChange={(value) => setFormData({...formData, document_type: value})}
+                        value={templateData.document_type} 
+                        onValueChange={(value) => setTemplateData({...templateData, document_type: value})}
                       >
                         <SelectTrigger>
                           <SelectValue />
@@ -323,8 +309,8 @@ const DocuSealManagerImproved = () => {
                     <Label htmlFor="description">Description</Label>
                     <Textarea
                       id="description"
-                      value={formData.description}
-                      onChange={(e) => setFormData({...formData, description: e.target.value})}
+                      value={templateData.description}
+                      onChange={(e) => setTemplateData({...templateData, description: e.target.value})}
                       placeholder="Brief description of the document and its purpose"
                       rows={3}
                     />
@@ -332,8 +318,8 @@ const DocuSealManagerImproved = () => {
                   <div className="space-y-2">
                     <Label htmlFor="client_id">Assign to Client</Label>
                     <Select 
-                      value={formData.client_id} 
-                      onValueChange={(value) => setFormData({...formData, client_id: value})}
+                      value={templateData.client_id} 
+                      onValueChange={(value) => setTemplateData({...templateData, client_id: value})}
                     >
                       <SelectTrigger>
                         <SelectValue placeholder="Select a client for this document" />
@@ -390,7 +376,7 @@ const DocuSealManagerImproved = () => {
                 </div>
                 <div>
                   <p className="text-sm font-medium text-gray-600">Total Documents</p>
-                  <p className="text-2xl font-bold text-gray-900">{forms.length}</p>
+                  <p className="text-2xl font-bold text-gray-900">{templates.length}</p>
                 </div>
               </div>
             </CardContent>
@@ -404,7 +390,7 @@ const DocuSealManagerImproved = () => {
                 <div>
                   <p className="text-sm font-medium text-gray-600">Completed</p>
                   <p className="text-2xl font-bold text-gray-900">
-                    {forms.reduce((total, form) => total + getCompletedSubmissionsCount(form), 0)}
+                    {templates.reduce((total, template) => total + getCompletedSubmissionsCount(template), 0)}
                   </p>
                 </div>
               </div>
@@ -419,7 +405,7 @@ const DocuSealManagerImproved = () => {
                 <div>
                   <p className="text-sm font-medium text-gray-600">Pending</p>
                   <p className="text-2xl font-bold text-gray-900">
-                    {forms.reduce((total, form) => total + getPendingSubmissionsCount(form), 0)}
+                    {templates.reduce((total, template) => total + getPendingSubmissionsCount(template), 0)}
                   </p>
                 </div>
               </div>
@@ -443,9 +429,9 @@ const DocuSealManagerImproved = () => {
         {/* Documents Table */}
         <Card>
           <CardHeader>
-            <CardTitle>Document Forms</CardTitle>
+            <CardTitle>Document Templates</CardTitle>
             <CardDescription>
-              Manage your document signing forms and track submissions
+              Manage your document signing templates and track submissions
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -454,7 +440,7 @@ const DocuSealManagerImproved = () => {
                 <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
                 <p className="text-gray-600">Loading documents...</p>
               </div>
-            ) : forms.length === 0 ? (
+            ) : templates.length === 0 ? (
               <div className="text-center py-12">
                 <FileText className="h-12 w-12 text-gray-400 mx-auto mb-4" />
                 <h3 className="text-lg font-medium text-gray-900 mb-2">No documents yet</h3>
@@ -479,33 +465,33 @@ const DocuSealManagerImproved = () => {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {forms.map((form) => (
-                      <TableRow key={form.id}>
+                    {templates.map((template) => (
+                      <TableRow key={template.id}>
                         <TableCell>
                           <div>
-                            <div className="font-medium text-gray-900">{form.name}</div>
-                            <div className="text-sm text-gray-500">{form.description}</div>
+                            <div className="font-medium text-gray-900">{template.name}</div>
+                            <div className="text-sm text-gray-500">{template.description}</div>
                           </div>
                         </TableCell>
                         <TableCell>
-                          <Badge variant="outline">{getDocumentTypeLabel(formData.document_type)}</Badge>
+                          <Badge variant="outline">{getDocumentTypeLabel(templateData.document_type)}</Badge>
                         </TableCell>
                         <TableCell>
                           <div className="text-sm">
-                            {formData.client_id ? getClientName(formData.client_id) : 'Not assigned'}
+                            {templateData.client_id ? getClientName(templateData.client_id) : 'Not assigned'}
                           </div>
                         </TableCell>
-                        <TableCell>{getStatusBadge(form.status)}</TableCell>
+                        <TableCell>{getStatusBadge(template.status)}</TableCell>
                         <TableCell>
                           <div className="text-sm">
-                            <div className="font-medium">{form.submissions_count} total</div>
-                            <div className="text-gray-500">{getCompletedSubmissionsCount(form)} completed</div>
+                            <div className="font-medium">{template.submissions_count} total</div>
+                            <div className="text-gray-500">{getCompletedSubmissionsCount(template)} completed</div>
                           </div>
                         </TableCell>
                         <TableCell>
                           <div className="text-sm">
-                            <div className="font-medium">{new Date(form.created_at).toLocaleDateString()}</div>
-                            <div className="text-gray-500">{new Date(form.created_at).toLocaleTimeString()}</div>
+                            <div className="font-medium">{new Date(template.created_at).toLocaleDateString()}</div>
+                            <div className="text-gray-500">{new Date(template.created_at).toLocaleTimeString()}</div>
                           </div>
                         </TableCell>
                         <TableCell>
@@ -514,7 +500,7 @@ const DocuSealManagerImproved = () => {
                               variant="outline"
                               size="sm"
                               onClick={() => {
-                                setSubmissionData({...submissionData, form_id: form.id});
+                                setSubmissionData({...submissionData, template_id: template.id});
                                 setIsSendOpen(true);
                               }}
                             >
@@ -524,16 +510,16 @@ const DocuSealManagerImproved = () => {
                             <Button
                               variant="outline"
                               size="sm"
-                              onClick={() => openFormBuilder(form.id)}
+                              onClick={() => openTemplateBuilder(template.id)}
                             >
                               <Edit className="h-4 w-4 mr-1" />
                               Edit
                             </Button>
-                            {form.submissions && form.submissions.length > 0 && (
+                            {template.submissions && template.submissions.length > 0 && (
                               <Button
                                 variant="outline"
                                 size="sm"
-                                onClick={() => viewSubmissions(form)}
+                                onClick={() => viewSubmissions(template)}
                               >
                                 <Eye className="h-4 w-4 mr-1" />
                                 View
@@ -615,28 +601,28 @@ const DocuSealManagerImproved = () => {
         <DialogContent className="sm:max-w-[700px]">
           <DialogHeader>
             <DialogTitle>
-              Submissions - {selectedForm?.name}
+              Submissions - {selectedTemplate?.name}
             </DialogTitle>
           </DialogHeader>
           
-          {selectedForm && (
+          {selectedTemplate && (
             <div className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
                 <div className="bg-blue-50 p-3 rounded">
                   <div className="font-medium">Total Submissions</div>
-                  <div className="text-2xl font-bold">{selectedForm.submissions?.length || 0}</div>
+                  <div className="text-2xl font-bold">{selectedTemplate.submissions?.length || 0}</div>
                 </div>
                 <div className="bg-green-50 p-3 rounded">
                   <div className="font-medium">Completed</div>
-                  <div className="text-2xl font-bold text-green-600">{getCompletedSubmissionsCount(selectedForm)}</div>
+                  <div className="text-2xl font-bold text-green-600">{getCompletedSubmissionsCount(selectedTemplate)}</div>
                 </div>
                 <div className="bg-yellow-50 p-3 rounded">
                   <div className="font-medium">Pending</div>
-                  <div className="text-2xl font-bold text-yellow-600">{getPendingSubmissionsCount(selectedForm)}</div>
+                  <div className="text-2xl font-bold text-yellow-600">{getPendingSubmissionsCount(selectedTemplate)}</div>
                 </div>
               </div>
 
-              {selectedForm.submissions && selectedForm.submissions.length > 0 ? (
+              {selectedTemplate.submissions && selectedTemplate.submissions.length > 0 ? (
                 <Table>
                   <TableHeader>
                     <TableRow>
@@ -648,7 +634,7 @@ const DocuSealManagerImproved = () => {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {selectedForm.submissions.map((submission) => (
+                    {selectedTemplate.submissions.map((submission) => (
                       <TableRow key={submission.id}>
                         <TableCell>{submission.email}</TableCell>
                         <TableCell>{getStatusBadge(submission.status)}</TableCell>
