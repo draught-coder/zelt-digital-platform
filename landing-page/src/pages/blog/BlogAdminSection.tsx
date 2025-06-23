@@ -1,7 +1,6 @@
-
 import React, { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
+import { supabase } from "../../../../dashboard-app/src/integrations/supabase/client";
 import { toast } from "@/components/ui/use-toast";
 import BlogAdminPanel from "./BlogAdminPanel";
 import BlogPostList from "./BlogPostList";

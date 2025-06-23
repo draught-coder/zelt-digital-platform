@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import InfoHero from "@/components/info/InfoHero";
@@ -6,7 +5,7 @@ import IndividualTaxRates from "@/components/info/IndividualTaxRates";
 import CorporateTaxRates from "@/components/info/CorporateTaxRates";
 import TaxReliefCards from "@/components/info/TaxReliefCards";
 import InfoContactCTA from "@/components/info/InfoContactCTA";
-import { supabase } from "@/integrations/supabase/client";
+import { supabase } from "../../../dashboard-app/src/integrations/supabase/client";
 
 const Info = () => {
   const [years, setYears] = useState<string[]>([]);

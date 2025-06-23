@@ -1,6 +1,5 @@
-
 import React, { useState, useEffect } from 'react';
-import { supabase } from "@/integrations/supabase/client";
+import { supabase } from "../../../dashboard-app/src/integrations/supabase/client";
 import { useNavigate } from 'react-router-dom';
 import BlogHero from "./blog/BlogHero";
 import BlogPostGrid from "./blog/BlogPostGrid";
