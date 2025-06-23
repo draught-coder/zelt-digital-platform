@@ -14,10 +14,21 @@ export default {
 		url.hostname = "sign.app.ibnzelt.com";
 		url.protocol = "https:";
 
-		// Prepare init object to forward method, headers, and body
+		// Clone headers and explicitly forward X-Auth-Token
+		const incomingHeaders = new Headers(request.headers);
+		const outgoingHeaders = new Headers();
+		// Forward only the X-Auth-Token and Content-Type headers
+		if (incomingHeaders.has('x-auth-token')) {
+			outgoingHeaders.set('x-auth-token', incomingHeaders.get('x-auth-token'));
+		}
+		if (incomingHeaders.has('content-type')) {
+			outgoingHeaders.set('content-type', incomingHeaders.get('content-type'));
+		}
+		// Add any other headers you want to forward here
+
 		const init = {
 			method: request.method,
-			headers: request.headers,
+			headers: outgoingHeaders,
 			body: request.method !== "GET" && request.method !== "HEAD" ? await request.arrayBuffer() : undefined,
 			redirect: "follow"
 		};
@@ -27,7 +38,7 @@ export default {
 		const newHeaders = new Headers(docusealResponse.headers);
 		newHeaders.set("Access-Control-Allow-Origin", "https://www.ibnzelt.com");
 		newHeaders.set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
-		newHeaders.set("Access-Control-Allow-Headers", "Authorization, Content-Type");
+		newHeaders.set("Access-Control-Allow-Headers", "X-Auth-Token, Authorization, Content-Type");
 		newHeaders.set("Access-Control-Allow-Credentials", "true");
 
 		if (request.method === "OPTIONS") {
