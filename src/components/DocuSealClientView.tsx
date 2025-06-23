@@ -8,6 +8,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { useToast } from '@/hooks/use-toast';
 import { FileText, ExternalLink, Download, Home } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { supabaseClient } from '@/lib/docuseal-api';
 
 interface ClientDocument {
   id: string;
@@ -18,6 +19,9 @@ interface ClientDocument {
   signed_at?: string;
   document_url?: string;
   message?: string;
+  template_id: string;
+  assigned_client: string;
+  created_at: string;
 }
 
 const DocuSealClientView = () => {
@@ -35,34 +39,20 @@ const DocuSealClientView = () => {
   const fetchClientDocuments = async () => {
     setLoading(true);
     try {
-      // For now, we'll use mock data until the database integration is complete
-      // In the future, this will fetch from the docuseal_submissions table
-      const mockDocuments: ClientDocument[] = [
-        {
-          id: 'mock-1',
-          form_name: 'Tax Authorization Form 2024',
-          status: 'pending',
-          sent_at: '2024-01-15T10:00:00Z',
-          expires_at: '2024-01-22T10:00:00Z',
-          message: 'Please review and sign this tax authorization form.'
-        },
-        {
-          id: 'mock-2',
-          form_name: 'Financial Statement Approval',
-          status: 'completed',
-          sent_at: '2024-01-10T14:30:00Z',
-          signed_at: '2024-01-12T09:15:00Z',
-          document_url: 'https://example.com/signed-doc.pdf'
-        }
-      ];
-      
-      setDocuments(mockDocuments);
+      if (!user) return;
+      // Fetch only documents assigned to this client
+      const { data, error } = await supabaseClient
+        .from('documents')
+        .select('*')
+        .eq('assigned_client', user.email); // or user.id if you use IDs
+      if (error) throw error;
+      setDocuments(data || []);
     } catch (error) {
       console.error('Error fetching documents:', error);
       toast({
-        title: "Error",
-        description: "Failed to fetch documents",
-        variant: "destructive"
+        title: 'Error',
+        description: 'Failed to fetch documents',
+        variant: 'destructive',
       });
     } finally {
       setLoading(false);
@@ -228,6 +218,18 @@ const DocuSealClientView = () => {
             </div>
           </CardContent>
         </Card>
+      )}
+
+      {documents.length === 0 ? (
+        <div className="text-center text-gray-500">No documents assigned to you yet.</div>
+      ) : (
+        documents.map((doc) => (
+          <div key={doc.id} className="mb-4 p-4 border rounded">
+            <div className="font-bold">{doc.template_id}</div>
+            <div className="text-sm text-gray-500">Assigned: {doc.assigned_client}</div>
+            <div className="text-sm text-gray-500">Created: {new Date(doc.created_at).toLocaleString()}</div>
+          </div>
+        ))
       )}
     </div>
   );

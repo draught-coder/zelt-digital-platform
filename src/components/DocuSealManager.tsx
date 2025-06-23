@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/hooks/useAuth';
-import { supabase } from '@/integrations/supabase/client';
+import { supabaseClient } from '@/lib/docuseal-api';
 import { docuSealAPI, DocuSealTemplate, DocuSealSubmission } from '@/lib/docuseal-api';
 // import { n8nIntegration, N8NWebhookData } from '@/lib/n8n-integration';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
@@ -46,10 +46,11 @@ const DocuSealManager = () => {
 
   const [submissionData, setSubmissionData] = useState({
     template_id: '',
-    client_email: '',
-    message: '',
-    expires_in_days: 7
+    client_email: ''
   });
+
+  const [statusFilter, setStatusFilter] = useState('all');
+  const [eventLogs, setEventLogs] = useState([]);
 
   useEffect(() => {
     fetchTemplates();
@@ -61,19 +62,41 @@ const DocuSealManager = () => {
     try {
       const templatesResponse = await docuSealAPI.getTemplates();
       console.log('DocuSeal templates API response:', templatesResponse);
+      let templatesArray = [];
       if (templatesResponse && Array.isArray(templatesResponse.data)) {
-        setTemplates(templatesResponse.data);
+        templatesArray = templatesResponse.data;
       } else if (Array.isArray(templatesResponse)) {
-        // fallback for old code
-        setTemplates(templatesResponse);
+        templatesArray = templatesResponse;
       } else {
-        setTemplates([]);
+        templatesArray = [];
         console.error('Unexpected templates API response shape:', templatesResponse);
         toast({
           title: "Error",
           description: "Unexpected API response. Please contact support.",
           variant: "destructive"
         });
+      }
+      // Fetch assignments from Supabase
+      const { data: assignments, error } = await supabaseClient
+        .from('documents')
+        .select('template_id, assigned_client');
+      if (!error && assignments) {
+        // Merge assigned_client into templates
+        const merged = templatesArray.map(t => {
+          const found = assignments.find(a => String(a.template_id) === String(t.id));
+          return { ...t, assigned_client: found ? found.assigned_client : undefined, status: found ? found.status : 'assigned' };
+        });
+        setTemplates(merged);
+      } else {
+        setTemplates(templatesArray);
+      }
+      // Fetch event logs from Supabase
+      const { data: logs, error: logsError } = await supabaseClient
+        .from('event_logs')
+        .select('document_id, event_type, created_at')
+        .order('created_at', { ascending: false });
+      if (!logsError && logs) {
+        setEventLogs(logs);
       }
     } catch (error) {
       console.error('Error fetching templates:', error);
@@ -89,7 +112,7 @@ const DocuSealManager = () => {
 
   const fetchClients = async () => {
     try {
-      const { data, error } = await supabase
+      const { data, error } = await supabaseClient
         .from('profiles')
         .select('id, email, full_name')
         .eq('role', 'client');
@@ -155,57 +178,32 @@ const DocuSealManager = () => {
   const handleSendSubmission = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    
     try {
-      await docuSealAPI.sendSubmission(Number(submissionData.template_id), {
-        email: submissionData.client_email,
-        message: submissionData.message,
-        expires_in_days: submissionData.expires_in_days
-      });
-
-      // Trigger n8n automation
-      try {
-        const client = clients.find((c: any) => c.email === submissionData.client_email);
-        const template = templates.find(t => t.id === submissionData.template_id);
-        
-        // await n8nIntegration.triggerDocumentSent({
-        //   event_type: 'document_sent',
-        //   document_id: submissionData.template_id,
-        //   form_name: template?.name || 'Document',
-        //   client_email: submissionData.client_email,
-        //   client_name: client?.full_name || submissionData.client_email.split('@')[0],
-        //   bookkeeper_email: user?.email || '',
-        //   bookkeeper_name: user?.email?.split('@')[0] || 'Bookkeeper',
-        //   status: 'pending',
-        //   created_at: new Date().toISOString(),
-        //   expires_at: new Date(Date.now() + submissionData.expires_in_days * 24 * 60 * 60 * 1000).toISOString(),
-        //   document_url: template ? docuSealAPI.getSigningUrl(submissionData.template_id) : '',
-        //   message: submissionData.message
-        // });
-      } catch (automationError) {
-        console.error('Automation error:', automationError);
-        // Don't fail the main operation if automation fails
-      }
-
+      // Save assignment in Supabase
+      const { error } = await supabaseClient.from('documents').insert([
+        {
+          template_id: submissionData.template_id,
+          assigned_client: submissionData.client_email,
+          created_at: new Date().toISOString(),
+        },
+      ]);
+      if (error) throw error;
       toast({
-        title: "Success",
-        description: "Document sent for signing",
+        title: 'Success',
+        description: 'Document assigned to client',
       });
-      
       setIsSendOpen(false);
       setSubmissionData({
         template_id: '',
         client_email: '',
-        message: '',
-        expires_in_days: 7
       });
       fetchTemplates();
     } catch (error) {
-      console.error('Error sending submission:', error);
+      console.error('Error assigning document:', error);
       toast({
-        title: "Error",
-        description: "Failed to send document",
-        variant: "destructive"
+        title: 'Error',
+        description: 'Failed to assign document',
+        variant: 'destructive',
       });
     } finally {
       setLoading(false);
@@ -268,6 +266,11 @@ const DocuSealManager = () => {
   const getClientName = (clientId: string) => {
     const client = clients.find((c: any) => c.id === clientId);
     return client ? client.full_name || client.email : 'Not assigned';
+  };
+
+  const getLatestEvent = (templateId) => {
+    const log = eventLogs.find(e => String(e.document_id) === String(templateId));
+    return log ? `${log.event_type} (${new Date(log.created_at).toLocaleString()})` : 'No events';
   };
 
   return (
@@ -362,6 +365,18 @@ const DocuSealManager = () => {
           </Card>
         </div>
 
+        {/* Filter dropdown */}
+        <div className="flex justify-end mb-4">
+          <select value={statusFilter} onChange={e => setStatusFilter(e.target.value)} className="border rounded px-2 py-1">
+            <option value="all">All Statuses</option>
+            <option value="assigned">Assigned</option>
+            <option value="pending">Pending</option>
+            <option value="viewed">Viewed</option>
+            <option value="signed">Signed</option>
+            <option value="completed">Completed</option>
+          </select>
+        </div>
+
         {/* Documents Table */}
         <Card>
           <CardHeader>
@@ -393,13 +408,14 @@ const DocuSealManager = () => {
                     <TableRow>
                       <TableHead>Document</TableHead>
                       <TableHead>Assigned Client</TableHead>
+                      <TableHead>Status</TableHead>
                       <TableHead>Latest Event Log</TableHead>
                       <TableHead>Created</TableHead>
                       <TableHead>Actions</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {Array.isArray(templates) ? templates.map((template) => (
+                    {Array.isArray(templates) ? templates.filter(t => statusFilter === 'all' || t.status === statusFilter).map((template) => (
                       <TableRow key={String(template.id)}>
                         <TableCell>
                           <div>
@@ -408,10 +424,15 @@ const DocuSealManager = () => {
                           </div>
                         </TableCell>
                         <TableCell>
-                          <div className="text-sm">N/A</div>
+                          <div className="text-sm">
+                            {template.assigned_client || 'N/A'}
+                          </div>
                         </TableCell>
                         <TableCell>
-                          <div className="text-sm">N/A</div>
+                          <div className="text-sm capitalize">{template.status || 'assigned'}</div>
+                        </TableCell>
+                        <TableCell>
+                          <div className="text-sm">{getLatestEvent(template.id)}</div>
                         </TableCell>
                         <TableCell>
                           <div className="text-sm">
@@ -457,6 +478,7 @@ const DocuSealManager = () => {
         <DialogContent className="sm:max-w-[500px]">
           <DialogHeader>
             <DialogTitle>Send Document for Signing</DialogTitle>
+            <p className="text-sm text-muted-foreground mb-2">This will assign the document to the selected client. No email will be sent.</p>
           </DialogHeader>
           
           <form onSubmit={handleSendSubmission} className="space-y-4">
@@ -465,6 +487,7 @@ const DocuSealManager = () => {
               <Select 
                 value={submissionData.client_email} 
                 onValueChange={(value) => setSubmissionData({...submissionData, client_email: value})}
+                required
               >
                 <SelectTrigger>
                   <SelectValue placeholder="Select client email" />
@@ -477,27 +500,6 @@ const DocuSealManager = () => {
                   ))}
                 </SelectContent>
               </Select>
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="message">Message</Label>
-              <Textarea
-                id="message"
-                value={submissionData.message}
-                onChange={(e) => setSubmissionData({...submissionData, message: e.target.value})}
-                placeholder="Please review and sign this document..."
-                rows={3}
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="expires_in_days">Expires in (days)</Label>
-              <Input
-                id="expires_in_days"
-                type="number"
-                value={submissionData.expires_in_days}
-                onChange={(e) => setSubmissionData({...submissionData, expires_in_days: parseInt(e.target.value)})}
-                min="1"
-                max="30"
-              />
             </div>
             <div className="flex justify-end space-x-2">
               <Button type="button" variant="outline" onClick={() => setIsSendOpen(false)}>
