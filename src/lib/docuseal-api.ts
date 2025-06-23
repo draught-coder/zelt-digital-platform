@@ -1,11 +1,17 @@
 // DocuSeal API Client
 const DOCUSEAL_BASE_URL = 'https://docuseal-cors-proxy.ashrafsallehzelt.workers.dev';
-const DOCUSEAL_API_KEY = import.meta.env.VITE_DOCUSEAL_API_KEY || '';
+const DOCUSEAL_API_KEY = import.meta.env.VITE_DOCUSEAL_API_KEY;
+const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
+const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY;
+
+if (!DOCUSEAL_API_KEY) throw new Error("VITE_DOCUSEAL_API_KEY is required");
+if (!SUPABASE_URL) throw new Error("VITE_SUPABASE_URL is required");
+if (!SUPABASE_ANON_KEY) throw new Error("VITE_SUPABASE_ANON_KEY is required");
 
 import { createClient } from '@supabase/supabase-js';
 export const supabaseClient = createClient(
-  import.meta.env.VITE_SUPABASE_URL || '',
-  import.meta.env.VITE_SUPABASE_ANON_KEY || ''
+  SUPABASE_URL,
+  SUPABASE_ANON_KEY
 );
 
 export interface DocuSealTemplate {
