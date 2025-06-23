@@ -1,6 +1,6 @@
 // DocuSeal API Client
-const DOCUSEAL_BASE_URL = 'https://sign.app.ibnzelt.com';
-const DOCUSEAL_API_KEY = 'eCfHk2FfiW3SsCjbELmjcVrzgy3VwUuenhaM9aNvwis';
+const DOCUSEAL_BASE_URL = 'https://docuseal-cors-proxy.ashrafsallehzelt.workers.dev';
+const DOCUSEAL_API_KEY = 'docuseal_sk_1234567890abcdef'; // <-- Replace with your real API key
 
 export interface DocuSealTemplate {
   id: number;
@@ -43,7 +43,7 @@ class DocuSealAPI {
       extraHeaders = options.headers as Record<string, string>;
     }
     const headers: Record<string, string> = {
-      'X-Auth-Token': this.apiKey,
+      'Authorization': `Bearer ${this.apiKey}`,
       ...extraHeaders,
     };
     // Only set Content-Type if not sending FormData
