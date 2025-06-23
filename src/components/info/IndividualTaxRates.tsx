@@ -1,9 +1,8 @@
-
 import React from "react";
 import { Users } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { supabase } from "@/integrations/supabase/client";
+import { supabase } from "../../../dashboard-app/src/integrations/supabase/client";
 
 interface IndividualTaxRatesProps {
   selectedYear: string;
