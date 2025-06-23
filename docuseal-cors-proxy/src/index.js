@@ -10,22 +10,26 @@
 
 export default {
 	async fetch(request, env, ctx) {
-		// Build the target URL
 		const url = new URL(request.url);
 		url.hostname = "sign.app.ibnzelt.com";
 		url.protocol = "https:";
 
-		// Forward the request to DocuSeal
-		const docusealResponse = await fetch(url.toString(), request);
+		// Prepare init object to forward method, headers, and body
+		const init = {
+			method: request.method,
+			headers: request.headers,
+			body: request.method !== "GET" && request.method !== "HEAD" ? await request.arrayBuffer() : undefined,
+			redirect: "follow"
+		};
 
-		// Clone response and add CORS headers
+		const docusealResponse = await fetch(url.toString(), init);
+
 		const newHeaders = new Headers(docusealResponse.headers);
 		newHeaders.set("Access-Control-Allow-Origin", "https://www.ibnzelt.com");
 		newHeaders.set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
 		newHeaders.set("Access-Control-Allow-Headers", "Authorization, Content-Type");
 		newHeaders.set("Access-Control-Allow-Credentials", "true");
 
-		// Handle preflight OPTIONS
 		if (request.method === "OPTIONS") {
 			return new Response(null, {
 				status: 204,
@@ -33,7 +37,6 @@ export default {
 			});
 		}
 
-		// Return proxied response with CORS headers
 		return new Response(docusealResponse.body, {
 			status: docusealResponse.status,
 			statusText: docusealResponse.statusText,
