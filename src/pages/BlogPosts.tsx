@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { supabase } from "@/integrations/supabase/client";
+import { supabase } from "../../dashboard-app/src/integrations/supabase/client";
 import BlogHero from "./blog/BlogHero";
 import BlogPostGrid from "./blog/BlogPostGrid";
 import NewsletterSignup from "./blog/NewsletterSignup";
@@ -16,7 +16,10 @@ const BlogPosts = () => {
         .from('blog_posts')
         .select('*')
         .order('date', { ascending: false });
-      if (error) throw error;
+      if (error) {
+        console.error('Error fetching blog posts:', error);
+        throw error;
+      }
       return data;
     },
   });

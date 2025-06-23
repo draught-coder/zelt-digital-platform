@@ -1,7 +1,6 @@
-
 import React, { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
+import { supabase } from "../../../dashboard-app/src/integrations/supabase/client";
 import { toast } from "@/components/ui/use-toast";
 import BlogAdminPanel from "./BlogAdminPanel";
 import BlogPostList from "./BlogPostList";
@@ -28,7 +27,10 @@ const BlogAdminSection: React.FC<BlogAdminSectionProps> = ({ isAdmin }) => {
         .from('blog_posts')
         .select('*')
         .order('date', { ascending: false });
-      if (error) throw error;
+      if (error) {
+        console.error('Error fetching blog posts:', error);
+        throw error;
+      }
       return data;
     },
   });
@@ -37,7 +39,10 @@ const BlogAdminSection: React.FC<BlogAdminSectionProps> = ({ isAdmin }) => {
   const createMutation = useMutation({
     mutationFn: async (post: any) => {
       const { error } = await supabase.from('blog_posts').insert([post]);
-      if (error) throw error;
+      if (error) {
+        console.error('Error creating blog post:', error);
+        throw error;
+      }
     },
     onSuccess: () => {
       toast({ title: "Blog post created" });
@@ -53,7 +58,10 @@ const BlogAdminSection: React.FC<BlogAdminSectionProps> = ({ isAdmin }) => {
   const updateMutation = useMutation({
     mutationFn: async (post: any) => {
       const { error } = await supabase.from('blog_posts').update(post).eq('id', post.id);
-      if (error) throw error;
+      if (error) {
+        console.error('Error updating blog post:', error);
+        throw error;
+      }
     },
     onSuccess: () => {
       toast({ title: "Blog post updated" });
@@ -70,7 +78,10 @@ const BlogAdminSection: React.FC<BlogAdminSectionProps> = ({ isAdmin }) => {
   const deleteMutation = useMutation({
     mutationFn: async (postId: number) => {
       const { error } = await supabase.from('blog_posts').delete().eq('id', postId);
-      if (error) throw error;
+      if (error) {
+        console.error('Error deleting blog post:', error);
+        throw error;
+      }
     },
     onSuccess: () => {
       toast({ title: "Blog post deleted" });
