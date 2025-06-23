@@ -291,100 +291,10 @@ const DocuSealManager = () => {
               </div>
             </div>
             <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
-              <DialogTrigger asChild>
-                <Button className="flex items-center space-x-2">
-                  <Plus className="h-4 w-4" />
-                  <span>Create Document</span>
-                </Button>
-              </DialogTrigger>
-              <DialogContent className="sm:max-w-[600px]">
-                <DialogHeader>
-                  <DialogTitle>Create New Document</DialogTitle>
-                </DialogHeader>
-                <form onSubmit={handleCreateTemplate} className="space-y-6">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="name">Document Name</Label>
-                      <Input
-                        id="name"
-                        value={templateData.name}
-                        onChange={(e) => setTemplateData({...templateData, name: e.target.value})}
-                        placeholder="e.g., Tax Authorization Form 2024"
-                        required
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="document_type">Document Type</Label>
-                      <Select 
-                        value={templateData.document_type} 
-                        onValueChange={(value) => setTemplateData({...templateData, document_type: value})}
-                      >
-                        <SelectTrigger>
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="tax_authorization">Tax Authorization</SelectItem>
-                          <SelectItem value="financial_approval">Financial Statement Approval</SelectItem>
-                          <SelectItem value="engagement_letter">Engagement Letter</SelectItem>
-                          <SelectItem value="custom">Custom Document</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="description">Description</Label>
-                    <Textarea
-                      id="description"
-                      value={templateData.description}
-                      onChange={(e) => setTemplateData({...templateData, description: e.target.value})}
-                      placeholder="Brief description of the document and its purpose"
-                      rows={3}
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="client_id">Assign to Client</Label>
-                    <Select 
-                      value={templateData.client_id} 
-                      onValueChange={(value) => setTemplateData({...templateData, client_id: value})}
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select a client for this document" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {clients.map((client: any) => (
-                          <SelectItem key={client.id} value={client.id}>
-                            {client.full_name} ({client.email})
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    <p className="text-sm text-muted-foreground">
-                      Only the selected client will be able to see and sign this document
-                    </p>
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="file">Upload Document</Label>
-                    <Input
-                      id="file"
-                      type="file"
-                      accept=".pdf,.doc,.docx"
-                      onChange={(e) => setSelectedFile(e.target.files?.[0] || null)}
-                      required
-                    />
-                    <p className="text-sm text-muted-foreground">
-                      Supported formats: PDF, DOC, DOCX (Max 10MB)
-                    </p>
-                  </div>
-                  <div className="flex justify-end space-x-2">
-                    <Button type="button" variant="outline" onClick={() => setIsCreateOpen(false)}>
-                      Cancel
-                    </Button>
-                    <Button type="submit" disabled={loading}>
-                      {loading ? "Creating..." : "Create Document"}
-                    </Button>
-                  </div>
-                </form>
-              </DialogContent>
+              <Button className="flex items-center space-x-2" onClick={() => window.open('https://sign.app.ibnzelt.com', '_blank')}>
+                <Plus className="h-4 w-4" />
+                <span>Create Document</span>
+              </Button>
             </Dialog>
           </div>
         </div>
@@ -455,9 +365,9 @@ const DocuSealManager = () => {
         {/* Documents Table */}
         <Card>
           <CardHeader>
-            <CardTitle>Document Templates</CardTitle>
+            <CardTitle>Document Submission</CardTitle>
             <CardDescription>
-              Manage your document signing templates and track submissions
+              Manage your document submissions and track their status
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -482,10 +392,8 @@ const DocuSealManager = () => {
                   <TableHeader>
                     <TableRow>
                       <TableHead>Document</TableHead>
-                      <TableHead>Type</TableHead>
                       <TableHead>Assigned Client</TableHead>
-                      <TableHead>Status</TableHead>
-                      <TableHead>Submissions</TableHead>
+                      <TableHead>Latest Event Log</TableHead>
                       <TableHead>Created</TableHead>
                       <TableHead>Actions</TableHead>
                     </TableRow>
@@ -500,18 +408,10 @@ const DocuSealManager = () => {
                           </div>
                         </TableCell>
                         <TableCell>
-                          <Badge variant="outline">N/A</Badge>
-                        </TableCell>
-                        <TableCell>
                           <div className="text-sm">N/A</div>
                         </TableCell>
                         <TableCell>
-                          <Badge variant="outline">N/A</Badge>
-                        </TableCell>
-                        <TableCell>
-                          <div className="text-sm">
-                            <div className="font-medium">{template.submissions ? template.submissions.length : 0} total</div>
-                          </div>
+                          <div className="text-sm">N/A</div>
                         </TableCell>
                         <TableCell>
                           <div className="text-sm">
@@ -535,21 +435,11 @@ const DocuSealManager = () => {
                             <Button
                               variant="outline"
                               size="sm"
-                              onClick={() => openTemplateBuilder(template.id)}
+                              onClick={() => window.open('https://sign.app.ibnzelt.com', '_blank')}
                             >
                               <Edit className="h-4 w-4 mr-1" />
                               Edit
                             </Button>
-                            {template.submissions && template.submissions.length > 0 && (
-                              <Button
-                                variant="outline"
-                                size="sm"
-                                onClick={() => viewSubmissions(template)}
-                              >
-                                <Eye className="h-4 w-4 mr-1" />
-                                View
-                              </Button>
-                            )}
                           </div>
                         </TableCell>
                       </TableRow>
