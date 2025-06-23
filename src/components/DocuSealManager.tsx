@@ -59,8 +59,22 @@ const DocuSealManager = () => {
   const fetchTemplates = async () => {
     setLoading(true);
     try {
-      const templatesData = await docuSealAPI.getTemplates();
-      setTemplates(templatesData);
+      const templatesResponse = await docuSealAPI.getTemplates();
+      console.log('DocuSeal templates API response:', templatesResponse);
+      if (templatesResponse && Array.isArray(templatesResponse.data)) {
+        setTemplates(templatesResponse.data);
+      } else if (Array.isArray(templatesResponse)) {
+        // fallback for old code
+        setTemplates(templatesResponse);
+      } else {
+        setTemplates([]);
+        console.error('Unexpected templates API response shape:', templatesResponse);
+        toast({
+          title: "Error",
+          description: "Unexpected API response. Please contact support.",
+          variant: "destructive"
+        });
+      }
     } catch (error) {
       console.error('Error fetching templates:', error);
       toast({
@@ -402,7 +416,7 @@ const DocuSealManager = () => {
                 <div>
                   <p className="text-sm font-medium text-gray-600">Completed</p>
                   <p className="text-2xl font-bold text-gray-900">
-                    {templates.reduce((total, template) => total + getCompletedSubmissionsCount(template), 0)}
+                    {Array.isArray(templates) ? templates.reduce((total, template) => total + getCompletedSubmissionsCount(template), 0) : 0}
                   </p>
                 </div>
               </div>
@@ -417,7 +431,7 @@ const DocuSealManager = () => {
                 <div>
                   <p className="text-sm font-medium text-gray-600">Pending</p>
                   <p className="text-2xl font-bold text-gray-900">
-                    {templates.reduce((total, template) => total + getPendingSubmissionsCount(template), 0)}
+                    {Array.isArray(templates) ? templates.reduce((total, template) => total + getPendingSubmissionsCount(template), 0) : 0}
                   </p>
                 </div>
               </div>
@@ -477,7 +491,7 @@ const DocuSealManager = () => {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {templates.map((template) => (
+                    {Array.isArray(templates) ? templates.map((template) => (
                       <TableRow key={String(template.id)}>
                         <TableCell>
                           <div>
@@ -539,7 +553,7 @@ const DocuSealManager = () => {
                           </div>
                         </TableCell>
                       </TableRow>
-                    ))}
+                    )) : null}
                   </TableBody>
                 </Table>
               </div>
