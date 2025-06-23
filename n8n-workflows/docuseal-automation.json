@@ -1,0 +1,125 @@
+{
+  "name": "DocuSeal Document Automation",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "docuseal-document-sent",
+        "responseMode": "responseNode"
+      },
+      "id": "webhook-document-sent",
+      "name": "Document Sent Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [240, 300]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{ $json.event_type }}",
+              "operation": "equal",
+              "value2": "document_sent"
+            }
+          ]
+        }
+      },
+      "id": "if-document-sent",
+      "name": "Check Event Type",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [460, 300]
+    },
+    {
+      "parameters": {
+        "to": "={{ $json.client_email }}",
+        "subject": "Document Ready for Signature - {{ $json.form_name }}",
+        "text": "Hi {{ $json.client_name || 'there' }},\n\nYour bookkeeper has sent you a document for signature: {{ $json.form_name }}\n\nPlease click the link below to review and sign:\n{{ $json.document_url }}\n\nThis document expires on: {{ $json.expires_at }}\n\nMessage from your bookkeeper: {{ $json.message }}\n\nBest regards,\nZelt Digital Platform"
+      },
+      "id": "send-email",
+      "name": "Send Email Notification",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 1,
+      "position": [680, 200]
+    },
+    {
+      "parameters": {
+        "to": "={{ $json.client_email }}",
+        "message": "📄 *Document Ready for Signature*\n\nHi {{ $json.client_name || 'there' }},\n\nYour bookkeeper has sent you a document for signature: *{{ $json.form_name }}*\n\nPlease click the link to review and sign:\n{{ $json.document_url }}\n\n⏰ Expires: {{ $json.expires_at }}\n\nMessage: {{ $json.message }}\n\nBest regards,\nZelt Digital Platform"
+      },
+      "id": "send-whatsapp",
+      "name": "Send WhatsApp Message",
+      "type": "n8n-nodes-base.whatsApp",
+      "typeVersion": 1,
+      "position": [680, 400]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "{\n  \"status\": \"success\",\n  \"message\": \"Document sent successfully\",\n  \"timestamp\": \"{{ $now }}\"\n}"
+      },
+      "id": "response-success",
+      "name": "Success Response",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [900, 300]
+    }
+  ],
+  "connections": {
+    "Document Sent Webhook": {
+      "main": [
+        [
+          {
+            "node": "Check Event Type",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Event Type": {
+      "main": [
+        [
+          {
+            "node": "Send Email Notification",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send WhatsApp Message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Email Notification": {
+      "main": [
+        [
+          {
+            "node": "Success Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send WhatsApp Message": {
+      "main": [
+        [
+          {
+            "node": "Success Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {},
+  "versionId": "1"
+} 

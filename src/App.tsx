@@ -17,6 +17,10 @@ import Contact from "./pages/Contact";
 import NotFound from "./pages/NotFound";
 import AuthPage from "./pages/Auth";
 import Dashboard from "./pages/Dashboard";
+import DocuSealManager from "./components/DocuSealManager";
+import DocuSealClientView from "./components/DocuSealClientView";
+// import DocuSealAutomation from "./components/DocuSealAutomation";
+import SignRedirect from "./components/SignRedirect";
 import { AuthProvider } from "@/hooks/useAuth";
 
 const queryClient = new QueryClient();
@@ -36,6 +40,22 @@ const App = () => {
                 <Dashboard />
               </AuthProvider>
             } />
+            <Route path="/dashboard/documents" element={
+              <AuthProvider>
+                <DocuSealManager />
+              </AuthProvider>
+            } />
+            <Route path="/dashboard/my-documents" element={
+              <AuthProvider>
+                <DocuSealClientView />
+              </AuthProvider>
+            } />
+            <Route path="/dashboard/automation" element={
+              <AuthProvider>
+                <div>Automation page temporarily disabled</div>
+              </AuthProvider>
+            } />
+            <Route path="/sign/:submissionId" element={<SignRedirect />} />
             <Route path="/" element={<Layout><Home /></Layout>} />
             <Route path="/products" element={<Layout><Products /></Layout>} />
             <Route path="/blog" element={<Layout><Blog /></Layout>} />

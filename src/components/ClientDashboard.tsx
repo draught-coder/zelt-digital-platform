@@ -4,10 +4,11 @@ import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { LogOut, FileText, Calculator, TrendingUp, BarChart3 } from 'lucide-react';
+import { LogOut, FileText, Calculator, TrendingUp, BarChart3, Download } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import ClientReport from './ClientReport';
 import TaxSubmissions from './TaxSubmissions';
+import { Link } from 'react-router-dom';
 
 const ClientDashboard = () => {
   const { user, signOut } = useAuth();
@@ -69,10 +70,11 @@ const ClientDashboard = () => {
 
       <main className="max-w-7xl mx-auto px-6 py-8">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <TabsList className="grid w-full grid-cols-3">
+          <TabsList className="grid w-full grid-cols-4">
             <TabsTrigger value="overview">Overview</TabsTrigger>
             <TabsTrigger value="reports">Detailed Reports</TabsTrigger>
             <TabsTrigger value="statements">Statements</TabsTrigger>
+            <TabsTrigger value="documents">Documents</TabsTrigger>
           </TabsList>
 
           <TabsContent value="overview">
@@ -188,6 +190,34 @@ const ClientDashboard = () => {
                     </p>
                   </div>
                 )}
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="documents">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Download className="h-5 w-5" />
+                  Document Signing
+                </CardTitle>
+                <CardDescription>
+                  View and sign documents from your bookkeeper
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="text-center py-8">
+                  <Download className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                  <p className="text-muted-foreground mb-4">
+                    Access your document signing portal
+                  </p>
+                  <Link to="/dashboard/my-documents">
+                    <Button className="flex items-center gap-2">
+                      <FileText className="h-4 w-4" />
+                      View My Documents
+                    </Button>
+                  </Link>
+                </div>
               </CardContent>
             </Card>
           </TabsContent>

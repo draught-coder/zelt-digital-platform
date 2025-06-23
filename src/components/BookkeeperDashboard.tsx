@@ -3,7 +3,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { LogOut, Plus, Calculator, UserPlus } from 'lucide-react';
+import { LogOut, Plus, Calculator, UserPlus, FileText, Zap } from 'lucide-react';
 import ClientList from './ClientList';
 import FinancialStatementList from './FinancialStatementList';
 import FinancialStatementForm from './FinancialStatementForm';
@@ -23,6 +23,8 @@ import AddUserForm from './AddUserForm';
 import BlogAdminSection from '@/pages/blog/BlogAdminSection';
 import FinancialStatementManager from './FinancialStatementManager';
 import TaxComputationManager from './TaxComputationManager';
+import DocuSealManager from './DocuSealManager';
+import { Link } from 'react-router-dom';
 
 const BookkeeperDashboard = () => {
   const { user, signOut } = useAuth();
@@ -180,6 +182,23 @@ const BookkeeperDashboard = () => {
             <BlogAdminSection isAdmin={true} />
           </TabsContent>
         </Tabs>
+
+        <div className="mt-6">
+          <Link 
+            to="/dashboard/documents" 
+            className="flex items-center space-x-2 p-3 rounded-lg hover:bg-gray-100"
+          >
+            <FileText className="h-5 w-5" />
+            <span>Document Signing</span>
+          </Link>
+          <Link 
+            to="/dashboard/automation" 
+            className="flex items-center space-x-2 p-3 rounded-lg hover:bg-gray-100"
+          >
+            <Zap className="h-5 w-5" />
+            <span>Automation & Notifications</span>
+          </Link>
+        </div>
       </main>
     </div>
   );
