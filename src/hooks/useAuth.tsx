@@ -1,26 +1,23 @@
-import { createContext, useContext, useEffect, useState } from 'react';
-import { User, Session } from '@supabase/supabase-js';
+import React, { createContext, useContext, useEffect, useState } from 'react';
 import { supabase } from '../integrations/supabase/client';
-import { useToast } from '@/hooks/use-toast';
 
 interface AuthContextType {
-  user: User | null;
-  session: Session | null;
+  user: any;
+  session: any;
   userRole: string | null;
   loading: boolean;
-  signUp: (email: string, password: string, role: string, fullName: string) => Promise<{ error: any }>;
-  signIn: (email: string, password: string) => Promise<{ error: any }>;
+  signIn: (email: string, password: string) => Promise<any>;
+  signUp: (email: string, password: string, role: string, fullName: string) => Promise<any>;
   signOut: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [user, setUser] = useState<User | null>(null);
-  const [session, setSession] = useState<Session | null>(null);
+  const [user, setUser] = useState<any>(null);
+  const [session, setSession] = useState<any>(null);
   const [userRole, setUserRole] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
-  const { toast } = useToast();
 
   useEffect(() => {
     let loadingSet = false;
@@ -28,140 +25,64 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (!loadingSet) {
         setLoading(false);
         loadingSet = true;
-        console.log('[AuthProvider] Loading set to false');
       }
     };
 
-    // Set up auth state listener
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
+      async (_event, session) => {
         setSession(session);
         setUser(session?.user ?? null);
-        if (session?.user) {
-          setTimeout(() => {
-            fetchUserProfile(session.user.id);
-          }, 0);
-        } else {
-          setUserRole(null);
-        }
+        if (session?.user) fetchUserProfile(session.user.id);
+        else setUserRole(null);
         setLoadingOnce();
-        console.log('[AuthProvider] onAuthStateChange', { event, session });
       }
     );
 
-    // Check for existing session
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
       setUser(session?.user ?? null);
-      if (session?.user) {
-        fetchUserProfile(session.user.id);
-      }
+      if (session?.user) fetchUserProfile(session.user.id);
       setLoadingOnce();
-      console.log('[AuthProvider] getSession', { session });
     });
 
     return () => subscription.unsubscribe();
   }, []);
 
   const fetchUserProfile = async (userId: string) => {
-    try {
-      console.log('Fetching user profile for ID:', userId);
-      const { data, error } = await supabase
-        .from('profiles')
-        .select('role')
-        .eq('id', userId)
-        .single();
-      console.log('Profile fetch result:', { data, error });
-      if (error) {
-        console.error('Error fetching user profile:', error);
-      } else {
-        console.log('User role set to:', data?.role);
-        setUserRole(data?.role || null);
-      }
-    } catch (error) {
-      console.error('Error fetching user profile:', error);
-    }
-  };
-
-  const signUp = async (email: string, password: string, role: string, fullName: string) => {
-    const redirectUrl = `${window.location.origin}/`;
-    const { error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        emailRedirectTo: redirectUrl,
-        data: {
-          role,
-          full_name: fullName
-        }
-      }
-    });
-    if (error) {
-      toast({
-        title: "Sign Up Error",
-        description: error.message,
-        variant: "destructive"
-      });
-    } else {
-      toast({
-        title: "Success",
-        description: "Please check your email to confirm your account.",
-      });
-    }
-    return { error };
+    const { data } = await supabase
+      .from('profiles')
+      .select('role')
+      .eq('id', userId)
+      .single();
+    setUserRole(data?.role || null);
   };
 
   const signIn = async (email: string, password: string) => {
-    const { error } = await supabase.auth.signInWithPassword({
-      email,
-      password
-    });
-    if (error) {
-      toast({
-        title: "Sign In Error",
-        description: error.message,
-        variant: "destructive"
-      });
-    }
-    return { error };
+    return supabase.auth.signInWithPassword({ email, password });
   };
-
+  const signUp = async (email: string, password: string, role: string, fullName: string) => {
+    return supabase.auth.signUp({
+      email,
+      password,
+      options: { data: { role, full_name: fullName } }
+    });
+  };
   const signOut = async () => {
-    console.log('SignOut called');
-    try {
-      const { error } = await supabase.auth.signOut();
-      if (error) {
-        console.error('SignOut error:', error);
-      } else {
-        console.log('SignOut successful');
-      }
-    } catch (err) {
-      console.error('SignOut exception:', err);
-    }
+    await supabase.auth.signOut();
     setUser(null);
     setSession(null);
     setUserRole(null);
   };
 
   return (
-    <AuthContext.Provider value={{
-      user,
-      session,
-      userRole,
-      loading,
-      signUp,
-      signIn,
-      signOut
-    }}>
+    <AuthContext.Provider value={{ user, session, userRole, loading, signIn, signUp, signOut }}>
       {children}
     </AuthContext.Provider>
   );
 }
 
 export function useAuth() {
-  const context = useContext(AuthContext);
-  if (context === undefined) {
-    throw new Error('useAuth must be used within an AuthProvider');
-  }
-  return context;
+  const ctx = useContext(AuthContext);
+  if (!ctx) throw new Error('useAuth must be used within AuthProvider');
+  return ctx;
 }

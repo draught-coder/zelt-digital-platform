@@ -2,28 +2,28 @@
 import { createClient } from '@supabase/supabase-js';
 import type { Database } from './types';
 
+// Add __supabase to the Window type for TypeScript
+declare global {
+  interface Window {
+    __supabase?: ReturnType<typeof createClient<Database>>;
+  }
+}
+
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
-const SUPABASE_PUBLISHABLE_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY;
+const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
-if (!SUPABASE_URL) throw new Error("VITE_SUPABASE_URL is required");
-if (!SUPABASE_PUBLISHABLE_KEY) throw new Error("VITE_SUPABASE_ANON_KEY is required");
+if (!SUPABASE_URL || !SUPABASE_ANON_KEY) throw new Error('Missing Supabase env vars');
 
-// Singleton pattern for Supabase client (prevents multiple GoTrueClient instances)
 let _supabase: ReturnType<typeof createClient<Database>>;
 
-// @ts-ignore
 if (typeof window !== 'undefined') {
-  // @ts-ignore
   if (!window.__supabase) {
-    // @ts-ignore
-    window.__supabase = createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
+    window.__supabase = createClient<Database>(SUPABASE_URL, SUPABASE_ANON_KEY);
   }
-  // @ts-ignore
   _supabase = window.__supabase;
 } else {
-  // SSR or Node.js
   if (!_supabase) {
-    _supabase = createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
+    _supabase = createClient<Database>(SUPABASE_URL, SUPABASE_ANON_KEY);
   }
 }
 
