@@ -5,13 +5,21 @@ import { supabase } from "../integrations/supabase/client";
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-
-  // Auth state
   const [user, setUser] = useState(null);
   const [userRole, setUserRole] = useState(null);
+  const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
+  const location = useLocation();
 
   useEffect(() => {
+    let loadingSet = false;
+    const setLoadingOnce = () => {
+      if (!loadingSet) {
+        setLoading(false);
+        loadingSet = true;
+        console.log('[Header] Loading set to false');
+      }
+    };
     // Set up auth state listener first
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (_, session) => {
@@ -24,9 +32,12 @@ const Header = () => {
             .eq('id', session.user.id)
             .single();
           setUserRole(data?.role || null);
+          console.log('[Header] onAuthStateChange userRole:', data?.role);
         } else {
           setUserRole(null);
         }
+        setLoadingOnce();
+        console.log('[Header] onAuthStateChange', { session });
       }
     );
     // Get current
@@ -40,7 +51,10 @@ const Header = () => {
           .eq('id', session.user.id)
           .single();
         setUserRole(data?.role || null);
+        console.log('[Header] getSession userRole:', data?.role);
       }
+      setLoadingOnce();
+      console.log('[Header] getSession', { session });
     });
     return () => subscription.unsubscribe();
   }, []);
@@ -61,12 +75,15 @@ const Header = () => {
 
   const isActive = (path: string) => location.pathname === path;
 
-  const location = useLocation();
-
   const getDashboardButtonText = () => {
     if (!userRole) return 'Dashboard';
     return userRole === 'bookkeeper' ? 'Bookkeeper Dashboard' : 'Client Dashboard';
   };
+
+  // Optionally, show a loading spinner or skeleton while loading
+  if (loading) {
+    return <div className="h-16 flex items-center justify-center">Loading...</div>;
+  }
 
   return (
     <header className="fixed top-0 w-full bg-white/95 backdrop-blur-sm z-50 shadow-md">

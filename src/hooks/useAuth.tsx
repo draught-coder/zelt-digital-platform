@@ -23,21 +23,29 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const { toast } = useToast();
 
   useEffect(() => {
+    let loadingSet = false;
+    const setLoadingOnce = () => {
+      if (!loadingSet) {
+        setLoading(false);
+        loadingSet = true;
+        console.log('[AuthProvider] Loading set to false');
+      }
+    };
+
     // Set up auth state listener
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
         setSession(session);
         setUser(session?.user ?? null);
-        
         if (session?.user) {
-          // Fetch user profile to get role
           setTimeout(() => {
             fetchUserProfile(session.user.id);
           }, 0);
         } else {
           setUserRole(null);
         }
-        setLoading(false);
+        setLoadingOnce();
+        console.log('[AuthProvider] onAuthStateChange', { event, session });
       }
     );
 
@@ -48,7 +56,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (session?.user) {
         fetchUserProfile(session.user.id);
       }
-      setLoading(false);
+      setLoadingOnce();
+      console.log('[AuthProvider] getSession', { session });
     });
 
     return () => subscription.unsubscribe();
@@ -62,9 +71,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         .select('role')
         .eq('id', userId)
         .single();
-      
       console.log('Profile fetch result:', { data, error });
-      
       if (error) {
         console.error('Error fetching user profile:', error);
       } else {
@@ -78,7 +85,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const signUp = async (email: string, password: string, role: string, fullName: string) => {
     const redirectUrl = `${window.location.origin}/`;
-    
     const { error } = await supabase.auth.signUp({
       email,
       password,
@@ -90,7 +96,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         }
       }
     });
-    
     if (error) {
       toast({
         title: "Sign Up Error",
@@ -103,7 +108,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         description: "Please check your email to confirm your account.",
       });
     }
-    
     return { error };
   };
 
@@ -112,7 +116,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       email,
       password
     });
-    
     if (error) {
       toast({
         title: "Sign In Error",
@@ -120,7 +123,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         variant: "destructive"
       });
     }
-    
     return { error };
   };
 
