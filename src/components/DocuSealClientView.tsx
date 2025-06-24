@@ -8,7 +8,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { useToast } from '@/hooks/use-toast';
 import { FileText, ExternalLink, Download, Home } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { supabaseClient } from '@/lib/docuseal-api';
+import { supabase } from '@/integrations/supabase/client';
 
 interface ClientDocument {
   id: string;
@@ -41,7 +41,7 @@ const DocuSealClientView = () => {
     try {
       if (!user) return;
       // Fetch only documents assigned to this client
-      const { data, error } = await supabaseClient
+      const { data, error } = await supabase
         .from('documents')
         .select('*')
         .eq('assigned_client', user.email); // or user.id if you use IDs

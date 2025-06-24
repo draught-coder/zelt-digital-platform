@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { supabase } from "../../dashboard-app/src/integrations/supabase/client";
+import { supabase } from "../integrations/supabase/client";
 import BlogHero from "./blog/BlogHero";
 import BlogPostGrid from "./blog/BlogPostGrid";
 import NewsletterSignup from "./blog/NewsletterSignup";

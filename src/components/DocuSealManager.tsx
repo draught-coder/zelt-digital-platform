@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/hooks/useAuth';
-import { supabaseClient } from '@/lib/docuseal-api';
+import { supabase } from '@/integrations/supabase/client';
 import { docuSealAPI, DocuSealTemplate, DocuSealSubmission } from '@/lib/docuseal-api';
 // import { n8nIntegration, N8NWebhookData } from '@/lib/n8n-integration';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
@@ -77,7 +77,7 @@ const DocuSealManager = () => {
         });
       }
       // Fetch assignments from Supabase
-      const { data: assignments, error } = await supabaseClient
+      const { data: assignments, error } = await supabase
         .from('documents')
         .select('template_id, assigned_client');
       if (!error && assignments) {
@@ -91,7 +91,7 @@ const DocuSealManager = () => {
         setTemplates(templatesArray);
       }
       // Fetch event logs from Supabase
-      const { data: logs, error: logsError } = await supabaseClient
+      const { data: logs, error: logsError } = await supabase
         .from('event_logs')
         .select('document_id, event_type, created_at')
         .order('created_at', { ascending: false });
@@ -112,7 +112,7 @@ const DocuSealManager = () => {
 
   const fetchClients = async () => {
     try {
-      const { data, error } = await supabaseClient
+      const { data, error } = await supabase
         .from('profiles')
         .select('id, email, full_name')
         .eq('role', 'client');
@@ -180,7 +180,7 @@ const DocuSealManager = () => {
     setLoading(true);
     try {
       // Save assignment in Supabase
-      const { error } = await supabaseClient.from('documents').insert([
+      const { error } = await supabase.from('documents').insert([
         {
           template_id: submissionData.template_id,
           assigned_client: submissionData.client_email,
