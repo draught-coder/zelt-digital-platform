@@ -8,7 +8,26 @@ const SUPABASE_PUBLISHABLE_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY;
 if (!SUPABASE_URL) throw new Error("VITE_SUPABASE_URL is required");
 if (!SUPABASE_PUBLISHABLE_KEY) throw new Error("VITE_SUPABASE_ANON_KEY is required");
 
-// Import the supabase client like this:
-// import { supabase } from "@/integrations/supabase/client";
+// Singleton pattern for Supabase client (prevents multiple GoTrueClient instances)
+let _supabase: ReturnType<typeof createClient<Database>>;
 
-export const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY); 
+// @ts-ignore
+if (typeof window !== 'undefined') {
+  // @ts-ignore
+  if (!window.__supabase) {
+    // @ts-ignore
+    window.__supabase = createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
+  }
+  // @ts-ignore
+  _supabase = window.__supabase;
+} else {
+  // SSR or Node.js
+  if (!_supabase) {
+    _supabase = createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
+  }
+}
+
+export const supabase = _supabase;
+
+// Import the supabase client like this:
+// import { supabase } from "@/integrations/supabase/client"; 
