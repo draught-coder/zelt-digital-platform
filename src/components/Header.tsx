@@ -1,66 +1,16 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Menu, X } from 'lucide-react';
-import { supabase } from "../integrations/supabase/client";
+import { useAuth } from '../hooks/useAuth';
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [user, setUser] = useState(null);
-  const [userRole, setUserRole] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const { user, userRole, loading, signOut } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
 
-  useEffect(() => {
-    let loadingSet = false;
-    const setLoadingOnce = () => {
-      if (!loadingSet) {
-        setLoading(false);
-        loadingSet = true;
-        console.log('[Header] Loading set to false');
-      }
-    };
-    // Set up auth state listener first
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (_, session) => {
-        setUser(session?.user ?? null);
-        if (session?.user) {
-          // Fetch user role
-          const { data } = await supabase
-            .from('profiles')
-            .select('role')
-            .eq('id', session.user.id)
-            .single();
-          setUserRole(data?.role || null);
-          console.log('[Header] onAuthStateChange userRole:', data?.role);
-        } else {
-          setUserRole(null);
-        }
-        setLoadingOnce();
-        console.log('[Header] onAuthStateChange', { session });
-      }
-    );
-    // Get current
-    supabase.auth.getSession().then(async ({ data: { session } }) => {
-      setUser(session?.user ?? null);
-      if (session?.user) {
-        // Fetch user role
-        const { data } = await supabase
-          .from('profiles')
-          .select('role')
-          .eq('id', session.user.id)
-          .single();
-        setUserRole(data?.role || null);
-        console.log('[Header] getSession userRole:', data?.role);
-      }
-      setLoadingOnce();
-      console.log('[Header] getSession', { session });
-    });
-    return () => subscription.unsubscribe();
-  }, []);
-
   const handleLogout = async () => {
-    await supabase.auth.signOut();
+    await signOut();
     navigate("/", { replace: true });
   };
 
@@ -82,8 +32,11 @@ const Header = () => {
 
   // Optionally, show a loading spinner or skeleton while loading
   if (loading) {
+    console.log('[Header] loading...');
     return <div className="h-16 flex items-center justify-center">Loading...</div>;
   }
+
+  console.log('[Header] render', { user, userRole, loading });
 
   return (
     <header className="fixed top-0 w-full bg-white/95 backdrop-blur-sm z-50 shadow-md">
